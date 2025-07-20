@@ -379,6 +379,7 @@
                     <button class="tab-btn active" onclick="showKPITab('revenue')">Revenue KPIs</button>
                     <button class="tab-btn" onclick="showKPITab('operational')">Operational KPIs</button>
                     <button class="tab-btn" onclick="showKPITab('financial')">Financial KPIs</button>
+                    <button class="tab-btn" onclick="clearData()" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4);">🔄 Reset Data</button>
                 </div>
 
                 <div id="revenue-tab" class="tab-content active">
@@ -834,7 +835,7 @@
             }
         }
 
-        // Data persistence
+        // Data persistence with localStorage
         function saveData() {
             const data = {
                 property: {
@@ -849,7 +850,8 @@
                 },
                 fixedCosts: [],
                 revenues: [],
-                laborCosts: []
+                laborCosts: [],
+                lastUpdated: new Date().toISOString()
             };
 
             // Save dynamic data
@@ -884,11 +886,32 @@
                 }
             });
 
-            window.hotelData = data;
+            // Save to localStorage
+            try {
+                localStorage.setItem('hotelDashboardData', JSON.stringify(data));
+            } catch (e) {
+                console.warn('localStorage not available, using session storage');
+                window.hotelData = data;
+            }
         }
 
         function loadData() {
-            return window.hotelData || null;
+            try {
+                const saved = localStorage.getItem('hotelDashboardData');
+                return saved ? JSON.parse(saved) : null;
+            } catch (e) {
+                console.warn('localStorage not available, using session storage');
+                return window.hotelData || null;
+            }
+        }
+
+        function clearData() {
+            try {
+                localStorage.removeItem('hotelDashboardData');
+            } catch (e) {
+                window.hotelData = null;
+            }
+            location.reload();
         }
 
         // Event listeners
