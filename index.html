@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Business Breakeven Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            margin: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+            line-height: 1.3;
+        }
+
+        .content {
+            display: block;
+            gap: 0;
+            padding: 15px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .section h2 {
+            color: #4f46e5;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .add-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: auto;
+            transition: background 0.3s ease;
+            white-space: nowrap;
+            min-height: 36px;
+            touch-action: manipulation;
+        }
+
+        .add-btn:hover {
+            background: #059669;
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+        }
+
+        .input-row:hover {
+            background: #f3f4f6;
+        }
+
+        .input-row-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-row input[type="text"]:not(.number-input) {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .input-row input[type="text"].number-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-align: right;
+            min-height: 20px;
+        }
+
+        .input-row input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            min-width: 70px;
+            min-height: 36px;
+            transition: background 0.3s ease;
+            touch-action: manipulation;
+            align-self: flex-start;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+
+        .results {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .results h2 {
+            color: white;
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.3;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: right;
+            word-break: break-all;
+        }
+
+        .breakeven-highlight {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            font-size: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .room-settings {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .room-settings h2 {
+            color: white;
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .room-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .room-input {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .room-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .room-input input.number-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: right;
+            min-height: 20px;
+            box-sizing: border-box;
+        }
+
+        .room-input input.number-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: right;
+        }
+
+        .room-input input.number-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 30px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+                margin-bottom: 10px;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .content {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 25px;
+                padding: 25px;
+            }
+            
+            .section {
+                padding: 25px;
+                margin-bottom: 0;
+            }
+            
+            .section h2 {
+                font-size: 1.4rem;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+            
+            .input-row {
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .input-row input[type="text"]:not(.number-input) {
+                flex: 1;
+                padding: 10px 12px;
+            }
+            
+            .input-row input[type="text"].number-input {
+                width: 140px;
+                flex: none;
+                padding: 10px 12px;
+            }
+            
+            .room-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            
+            .metric {
+                padding: 15px 20px;
+                margin: 10px 0;
+                flex-wrap: nowrap;
+            }
+            
+            .metric-label {
+                font-size: 1.1rem;
+                min-width: auto;
+            }
+            
+            .metric-value {
+                font-size: 1.3rem;
+            }
+            
+            .breakeven-highlight {
+                font-size: 1.2rem;
+            }
+            
+            .results {
+                grid-column: 1 / -1;
+                margin-bottom: 0;
+            }
+            
+            .room-settings {
+                grid-column: 1 / -1;
+                margin-bottom: 0;
+            }
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🏨 Hotel Business Breakeven Dashboard</h1>
+            <p>Calculate your minimum income requirements in Thai Baht (THB)</p>
+        </div>
+
+        <div class="content">
+            <div class="section room-settings">
+                <h2>🏨 Room & Pricing Settings</h2>
+                <div class="room-grid">
+                    <div class="room-input">
+                        <label>Total Rooms Available</label>
+                        <input type="text" class="number-input" id="totalRooms" placeholder="50" oninput="handleNumberInput(this)" onblur="saveData()">
+                    </div>
+                    
+                    <div class="room-input">
+                        <label>Average Room Rate (THB)</label>
+                        <input type="text" class="number-input" id="roomRate" placeholder="4,000" oninput="handleNumberInput(this)" onblur="saveData()">
+                    </div>
+                    
+                    <div class="room-input">
+                        <label>Variable Cost per Room (THB)</label>
+                        <input type="text" class="number-input" id="variableCost" placeholder="800" oninput="handleNumberInput(this)" onblur="saveData()">
+                    </div>
+                    
+                    <div class="room-input">
+                        <label>Commission/OTA Fees (%)</label>
+                        <input type="text" class="number-input" id="commission" placeholder="15" oninput="handleNumberInput(this)" onblur="saveData()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>💰 Fixed Costs (Monthly) <button class="add-btn" onclick="addFixedCost()">+ Add Cost</button></h2>
+                <div id="fixedCosts">
+                    <!-- Fixed costs will be populated here -->
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📊 Revenue Streams (Monthly) <button class="add-btn" onclick="addRevenue()">+ Add Revenue</button></h2>
+                <div id="revenues">
+                    <!-- Revenues will be populated here -->
+                </div>
+            </div>
+
+            <div class="section results">
+                <h2>🎯 Breakeven Analysis Results</h2>
+                
+                <div class="metric">
+                    <span class="metric-label">Total Fixed Costs (Monthly)</span>
+                    <span class="metric-value" id="totalFixed">฿0</span>
+                </div>
+                
+                <div class="metric">
+                    <span class="metric-label">Contribution Margin per Room</span>
+                    <span class="metric-value" id="contributionMargin">฿0</span>
+                </div>
+                
+                <div class="metric breakeven-highlight">
+                    <span class="metric-label">🎯 Breakeven Rooms per Month</span>
+                    <span class="metric-value" id="breakevenRooms">0</span>
+                </div>
+                
+                <div class="metric breakeven-highlight">
+                    <span class="metric-label">🎯 Required Occupancy Rate</span>
+                    <span class="metric-value" id="occupancyRate">0%</span>
+                </div>
+                
+                <div class="metric">
+                    <span class="metric-label">Minimum Monthly Room Revenue</span>
+                    <span class="metric-value" id="minRoomRevenue">฿0</span>
+                </div>
+                
+                <div class="metric">
+                    <span class="metric-label">Total Monthly Revenue Needed</span>
+                    <span class="metric-value" id="totalRevNeeded">฿0</span>
+                </div>
+                
+                <div class="metric">
+                    <span class="metric-label">Safety Margin (20% above breakeven)</span>
+                    <span class="metric-value" id="safetyMargin">฿0</span>
+                </div>
+
+                <div id="warningMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fixedCostCounter = 0;
+        let revenueCounter = 0;
+
+        // Default fixed costs and revenues
+        const defaultFixedCosts = [
+            { name: 'Rent/Mortgage', value: 500000 },
+            { name: 'Staff Salaries', value: 800000 },
+            { name: 'Insurance', value: 65000 },
+            { name: 'Utilities (Base)', value: 100000 },
+            { name: 'Marketing & Advertising', value: 130000 },
+            { name: 'Maintenance & Repairs', value: 80000 }
+        ];
+
+        const defaultRevenues = [
+            { name: 'Food & Beverage Revenue', value: 500000 },
+            { name: 'Spa & Wellness', value: 100000 },
+            { name: 'Event & Conference', value: 80000 },
+            { name: 'Parking & Other Services', value: 30000 }
+        ];
+
+        function initializeDefaults() {
+            // Try to load saved data first
+            const savedData = loadData();
+            
+            if (savedData) {
+                // Load saved room settings
+                document.getElementById('totalRooms').value = savedData.totalRooms || '';
+                document.getElementById('roomRate').value = savedData.roomRate || '';
+                document.getElementById('variableCost').value = savedData.variableCost || '';
+                document.getElementById('commission').value = savedData.commission || '';
+
+                // Load saved fixed costs
+                if (savedData.fixedCosts && savedData.fixedCosts.length > 0) {
+                    savedData.fixedCosts.forEach(cost => {
+                        addFixedCost(cost.name, cost.value);
+                    });
+                } else {
+                    // Add defaults if no saved data
+                    defaultFixedCosts.forEach(cost => {
+                        addFixedCost(cost.name, formatNumberForDisplay(cost.value));
+                    });
+                }
+
+                // Load saved revenues
+                if (savedData.revenues && savedData.revenues.length > 0) {
+                    savedData.revenues.forEach(revenue => {
+                        addRevenue(revenue.name, revenue.value);
+                    });
+                } else {
+                    // Add defaults if no saved data
+                    defaultRevenues.forEach(revenue => {
+                        addRevenue(revenue.name, formatNumberForDisplay(revenue.value));
+                    });
+                }
+            } else {
+                // Set default room settings
+                document.getElementById('totalRooms').value = '50';
+                document.getElementById('roomRate').value = '4,000';
+                document.getElementById('variableCost').value = '800';
+                document.getElementById('commission').value = '15';
+
+                // Add default fixed costs
+                defaultFixedCosts.forEach(cost => {
+                    addFixedCost(cost.name, formatNumberForDisplay(cost.value));
+                });
+
+                // Add default revenues
+                defaultRevenues.forEach(revenue => {
+                    addRevenue(revenue.name, formatNumberForDisplay(revenue.value));
+                });
+            }
+
+            calculateBreakeven();
+        }
+
+        function addFixedCost(name = '', value = '') {
+            const container = document.getElementById('fixedCosts');
+            const row = document.createElement('div');
+            row.className = 'input-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Cost name (e.g., Insurance)" value="${name}" onchange="saveData()">
+                <div class="input-row-content">
+                    <input type="text" class="number-input" placeholder="0" value="${formatNumberForDisplay(value)}" oninput="handleNumberInput(this)" onblur="saveData()">
+                    <span style="min-width: 35px; text-align: center; font-size: 0.8rem;">THB</span>
+                    <button class="remove-btn" onclick="removeRow(this)">Remove</button>
+                </div>
+            `;
+            container.appendChild(row);
+            fixedCostCounter++;
+        }
+
+        function addRevenue(name = '', value = '') {
+            const container = document.getElementById('revenues');
+            const row = document.createElement('div');
+            row.className = 'input-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Revenue source (e.g., Spa Services)" value="${name}" onchange="saveData()">
+                <div class="input-row-content">
+                    <input type="text" class="number-input" placeholder="Monthly Revenue" value="${formatNumberForDisplay(value)}" oninput="handleNumberInput(this)" onblur="saveData()">
+                    <span style="min-width: 35px; text-align: center; font-size: 0.8rem;">THB</span>
+                    <button class="remove-btn" onclick="removeRow(this)">Remove</button>
+                </div>
+            `;
+            container.appendChild(row);
+            revenueCounter++;
+        }
+
+        function removeRow(button) {
+            button.parentElement.remove();
+            saveData();
+            calculateBreakeven();
+        }
+
+        function handleNumberInput(input) {
+            // Remove all non-digit characters except decimal point
+            let value = input.value.replace(/[^\d.]/g, '');
+            
+            // Handle decimal point
+            let parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            // Format with commas
+            if (parts[0]) {
+                parts[0] = parseInt(parts[0]).toLocaleString('en-US');
+            }
+            
+            input.value = parts.join('.');
+            calculateBreakeven();
+        }
+
+        function getNumberValue(input) {
+            return parseFloat(input.value.replace(/,/g, '')) || 0;
+        }
+
+        function formatNumberForDisplay(value) {
+            if (!value || value === '') return '';
+            const num = parseFloat(value);
+            return isNaN(num) ? '' : num.toLocaleString('en-US');
+        }
+
+        function saveData() {
+            const data = {
+                totalRooms: document.getElementById('totalRooms').value,
+                roomRate: document.getElementById('roomRate').value,
+                variableCost: document.getElementById('variableCost').value,
+                commission: document.getElementById('commission').value,
+                fixedCosts: [],
+                revenues: []
+            };
+
+            // Save fixed costs
+            const fixedCostInputs = document.querySelectorAll('#fixedCosts .input-row');
+            fixedCostInputs.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 2) {
+                    data.fixedCosts.push({
+                        name: inputs[0].value,
+                        value: inputs[1].value
+                    });
+                }
+            });
+
+            // Save revenues
+            const revenueInputs = document.querySelectorAll('#revenues .input-row');
+            revenueInputs.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 2) {
+                    data.revenues.push({
+                        name: inputs[0].value,
+                        value: inputs[1].value
+                    });
+                }
+            });
+
+            // Store in memory (no localStorage in Claude.ai environment)
+            window.hotelData = data;
+        }
+
+        function loadData() {
+            // In a real environment, you would load from localStorage here
+            // For Claude.ai, we'll use in-memory storage
+            return window.hotelData || null;
+        }
+
+        function calculateBreakeven() {
+            // Get room settings using new function
+            const totalRooms = getNumberValue(document.getElementById('totalRooms')) || 1;
+            const roomRate = getNumberValue(document.getElementById('roomRate')) || 0;
+            const variableCost = getNumberValue(document.getElementById('variableCost')) || 0;
+            const commission = getNumberValue(document.getElementById('commission')) || 0;
+
+            // Calculate total fixed costs
+            let totalFixedCosts = 0;
+            const fixedCostInputs = document.querySelectorAll('#fixedCosts .input-row');
+            fixedCostInputs.forEach(row => {
+                const inputs = row.querySelectorAll('input.number-input');
+                if (inputs.length > 0) {
+                    totalFixedCosts += getNumberValue(inputs[0]);
+                }
+            });
+
+            // Calculate net other revenue (now just total revenue since no variable costs)
+            let totalOtherRevenue = 0;
+            const revenueInputs = document.querySelectorAll('#revenues .input-row');
+            revenueInputs.forEach(row => {
+                const inputs = row.querySelectorAll('input.number-input');
+                if (inputs.length > 0) {
+                    totalOtherRevenue += getNumberValue(inputs[0]);
+                }
+            });
+
+            // Effective room rate after commission
+            const effectiveRoomRate = roomRate * (1 - commission / 100);
+            
+            // Contribution margin per room
+            const contributionMargin = effectiveRoomRate - variableCost;
+            
+            // Net fixed costs (after other revenue contributions)
+            const netFixedCosts = Math.max(0, totalFixedCosts - totalOtherRevenue);
+            
+            // Breakeven calculations
+            const breakevenRooms = contributionMargin > 0 ? Math.ceil(netFixedCosts / contributionMargin) : 0;
+            const maxRoomsPerMonth = totalRooms * 30;
+            const occupancyRate = maxRoomsPerMonth > 0 ? (breakevenRooms / maxRoomsPerMonth) * 100 : 0;
+            
+            const minRoomRevenue = breakevenRooms * effectiveRoomRate;
+            const totalRevNeeded = minRoomRevenue + totalOtherRevenue;
+            const safetyMargin = totalRevNeeded * 1.2;
+
+            // Update display with comma formatting
+            document.getElementById('totalFixed').textContent = `฿${totalFixedCosts.toLocaleString('en-US')}`;
+            document.getElementById('contributionMargin').textContent = `฿${contributionMargin.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('breakevenRooms').textContent = breakevenRooms.toLocaleString('en-US');
+            document.getElementById('occupancyRate').textContent = `${occupancyRate.toFixed(1)}%`;
+            document.getElementById('minRoomRevenue').textContent = `฿${minRoomRevenue.toLocaleString('en-US')}`;
+            document.getElementById('totalRevNeeded').textContent = `฿${totalRevNeeded.toLocaleString('en-US')}`;
+            document.getElementById('safetyMargin').textContent = `฿${safetyMargin.toLocaleString('en-US')}`;
+
+            // Warning messages
+            const warningDiv = document.getElementById('warningMessage');
+            warningDiv.innerHTML = '';
+            
+            if (occupancyRate > 100) {
+                warningDiv.innerHTML = '<div class="warning">⚠️ Warning: Required occupancy rate exceeds 100%! Consider reducing costs or increasing room rates.</div>';
+            } else if (occupancyRate > 85) {
+                warningDiv.innerHTML = '<div class="warning">⚠️ Caution: High occupancy rate required (>85%). Consider optimizing your cost structure.</div>';
+            }
+            
+            if (contributionMargin <= 0) {
+                warningDiv.innerHTML = '<div class="warning">❌ Critical: Negative contribution margin! Room rate is too low or variable costs too high.</div>';
+            }
+        }
+
+        // Initialize on page load
+        window.onload = initializeDefaults;
+    </script>
+</body>
+</html>
