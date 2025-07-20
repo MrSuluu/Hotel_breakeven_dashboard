@@ -275,91 +275,28 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        @media (min-width: 768px) {
-            body {
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
                 padding: 20px;
             }
             
-            .header {
-                padding: 30px;
-            }
-            
             .header h1 {
-                font-size: 2.2rem;
-                margin-bottom: 10px;
-            }
-            
-            .header p {
-                font-size: 1.1rem;
-            }
-            
-            .content {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 25px;
-                padding: 25px;
-            }
-            
-            .section {
-                padding: 25px;
-                margin-bottom: 0;
-            }
-            
-            .section h2 {
-                font-size: 1.4rem;
-                margin-bottom: 20px;
-                padding-bottom: 10px;
-            }
-            
-            .input-row {
-                flex-direction: row;
-                align-items: center;
-                gap: 10px;
-            }
-            
-            .input-row input[type="text"]:not(.number-input) {
-                flex: 1;
-                padding: 10px 12px;
-            }
-            
-            .input-row input[type="text"].number-input {
-                width: 140px;
-                flex: none;
-                padding: 10px 12px;
+                font-size: 2rem;
             }
             
             .room-grid {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 20px;
+                grid-template-columns: 1fr;
             }
-            
-            .metric {
-                padding: 15px 20px;
-                margin: 10px 0;
-                flex-wrap: nowrap;
+
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
             }
-            
-            .metric-label {
-                font-size: 1.1rem;
-                min-width: auto;
-            }
-            
-            .metric-value {
-                font-size: 1.3rem;
-            }
-            
-            .breakeven-highlight {
-                font-size: 1.2rem;
-            }
-            
-            .results {
-                grid-column: 1 / -1;
-                margin-bottom: 0;
-            }
-            
-            .room-settings {
-                grid-column: 1 / -1;
-                margin-bottom: 0;
+
+            .input-row input[type="number"] {
+                width: 100%;
             }
         }
 
@@ -573,7 +510,11 @@
         }
 
         function removeRow(button) {
-            button.parentElement.remove();
+            // Find the entire input-row container and remove it
+            const row = button.closest('.input-row');
+            if (row) {
+                row.remove();
+            }
             saveData();
             calculateBreakeven();
         }
