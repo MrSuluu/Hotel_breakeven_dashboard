@@ -557,22 +557,22 @@
                                 <label class="form-label">Total Rooms</label>
                                 <input type="text" class="form-input number-input" id="totalRooms" value="74" onchange="calculate()">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">Average Daily Rate (THB)</label>
                                 <input type="text" class="form-input number-input" id="adr" value="1,500" onchange="calculate()">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">Target Occupancy (%)</label>
                                 <input type="text" class="form-input number-input" id="occupancy" value="70" onchange="calculate()">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">OTA Commission (%)</label>
                                 <input type="text" class="form-input number-input" id="commission" value="15" onchange="calculate()">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">Variable Cost per Room (THB)</label>
                                 <input type="text" class="form-input number-input" id="variableCost" value="300" onchange="calculate()">
@@ -684,17 +684,17 @@
                                 <div class="metric-value" id="contributionMargin">฿0</div>
                                 <div class="metric-label">Contribution Margin</div>
                             </div>
-                            
+
                             <div class="metric-card">
                                 <div class="metric-value" id="totalCosts">฿0</div>
                                 <div class="metric-label">Total Monthly Costs</div>
                             </div>
-                            
+
                             <div class="metric-card">
                                 <div class="metric-value" id="safetyMargin">฿0</div>
                                 <div class="metric-label">Safety Margin (+20%)</div>
                             </div>
-                            
+
                             <div class="metric-card">
                                 <div class="metric-value" id="profitMargin">0%</div>
                                 <div class="metric-label">Profit Margin</div>
@@ -738,6 +738,65 @@
             return num.toLocaleString();
         }
 
+        function getListData(containerId) {
+            const items = [];
+            document.querySelectorAll(`#${containerId} .list-item`).forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 2) {
+                    items.push({
+                        description: inputs[0].value,
+                        value: inputs[1].value
+                    });
+                }
+            });
+            return items;
+        }
+
+        function renderList(containerId, items) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            items.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'list-item';
+                row.innerHTML = `
+                    <input type="text" class="form-input" value="${item.description}" onchange="calculate()">
+                    <input type="text" class="form-input number-input" value="${item.value}" onchange="calculate()">
+                    <span style="color: #64748b; font-size: 0.875rem;">THB</span>
+                    <div class="list-actions">
+                        <button class="btn-icon btn-remove" onclick="removeRow(this)">🗑</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function saveData() {
+            const data = {
+                totalRooms: document.getElementById('totalRooms').value,
+                adr: document.getElementById('adr').value,
+                occupancy: document.getElementById('occupancy').value,
+                commission: document.getElementById('commission').value,
+                variableCost: document.getElementById('variableCost').value,
+                fixedCosts: getListData('fixedCosts'),
+                laborCosts: getListData('laborCosts'),
+                revenues: getListData('revenues')
+            };
+            localStorage.setItem('dashboardData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('dashboardData') || 'null');
+            if (!data) return;
+            document.getElementById('totalRooms').value = data.totalRooms || '';
+            document.getElementById('adr').value = data.adr || '';
+            document.getElementById('occupancy').value = data.occupancy || '';
+            document.getElementById('commission').value = data.commission || '';
+            document.getElementById('variableCost').value = data.variableCost || '';
+            if (Array.isArray(data.fixedCosts)) renderList('fixedCosts', data.fixedCosts);
+            if (Array.isArray(data.laborCosts)) renderList('laborCosts', data.laborCosts);
+            if (Array.isArray(data.revenues)) renderList('revenues', data.revenues);
+        }
+
         function calculate() {
             // Get inputs
             const totalRooms = parseNumber(document.getElementById('totalRooms').value) || 74;
@@ -769,7 +828,7 @@
             const totalFixedCosts = fixedCosts + laborCosts;
             const effectiveADR = adr * (1 - commission / 100);
             const contributionMargin = effectiveADR - variableCost;
-            
+
             // Breakeven
             const netFixedCosts = Math.max(0, totalFixedCosts - additionalRevenue);
             const breakevenRoomsPerMonth = contributionMargin > 0 ? Math.ceil(netFixedCosts / contributionMargin) : 0;
@@ -810,6 +869,9 @@
 
             // Generate alerts
             generateAlerts(breakevenOccupancyRate, occupancy, monthlyProfit, contributionMargin);
+
+            // Persist state
+            saveData();
         }
 
         function generateAlerts(breakevenOccupancy, currentOccupancy, profit, contributionMargin) {
@@ -834,10 +896,7 @@
                     type: 'alert-warning',
                     message: `⚡ Current occupancy (${currentOccupancy}%) is above breakeven (${breakevenOccupancy.toFixed(1)}%) but could be optimized for better profitability.`
                 });
-            }
-
-            // Profitability analysis
-            if (profit < 0) {
+            } else if (profit < 0) {
                 alerts.push({
                     type: 'alert-danger',
                     message: `📉 Monthly loss of ฿${formatNumber(Math.abs(Math.round(profit)))}. Consider reducing costs or increasing rates/occupancy.`
@@ -958,6 +1017,9 @@
                     </div>
                 `;
 
+                // Remove saved data
+                localStorage.removeItem('dashboardData');
+
                 calculate();
             }
         }
@@ -1029,6 +1091,7 @@ This report was generated by Banana Guesthouse Management Dashboard.
 
         // Initialize calculations on page load
         document.addEventListener('DOMContentLoaded', function() {
+            loadData();
             calculate();
         });
 
