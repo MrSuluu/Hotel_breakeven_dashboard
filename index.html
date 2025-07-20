@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel Business Breakeven Dashboard</title>
+    <title>Professional Hotel Financial Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -13,138 +13,217 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1e40af 100%);
             min-height: 100vh;
-            padding: 10px;
-            margin: 0;
-            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            color: #1f2937;
         }
 
         .dashboard {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: #ffffff;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
             color: white;
-            padding: 20px 15px;
+            padding: 30px;
             text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
 
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 2.5rem;
             margin-bottom: 8px;
             font-weight: 700;
-            line-height: 1.2;
         }
 
         .header p {
             opacity: 0.9;
-            font-size: 0.95rem;
-            line-height: 1.3;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
         }
 
-        .content {
-            display: block;
-            gap: 0;
-            padding: 15px;
-        }
-
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 20px 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .section:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .section h2 {
-            color: #4f46e5;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 8px;
+        .kpi-tabs {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 10px;
+            justify-content: center;
             flex-wrap: wrap;
         }
 
-        .add-btn {
-            background: #10b981;
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
             color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            margin-left: auto;
-            transition: background 0.3s ease;
-            white-space: nowrap;
-            min-height: 36px;
-            touch-action: manipulation;
-        }
-
-        .add-btn:hover {
-            background: #059669;
-        }
-
-        .input-row {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
             border-radius: 8px;
-            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
             transition: all 0.3s ease;
         }
 
-        .input-row:hover {
-            background: #f3f4f6;
+        .panel:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
         }
 
-        .input-row-content {
+        .panel-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f3f4f6;
         }
 
-        .input-row input[type="text"]:not(.number-input) {
-            flex: 1;
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background: #2563eb;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+
+        .input-field {
             padding: 12px;
             border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            min-height: 20px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #ffffff;
         }
 
-        .input-row input[type="text"].number-input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            text-align: right;
-            min-height: 20px;
-        }
-
-        .input-row input:focus {
+        .input-field:focus {
             outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .number-input {
+            text-align: right;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .dynamic-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .dynamic-row:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .dynamic-row input:first-child {
+            flex: 2;
+            min-width: 0;
+        }
+
+        .dynamic-row input:nth-child(2) {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .currency-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+            min-width: 35px;
         }
 
         .remove-btn {
@@ -154,131 +233,119 @@
             padding: 8px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.75rem;
-            min-width: 70px;
-            min-height: 36px;
+            font-size: 0.8rem;
+            font-weight: 500;
             transition: background 0.3s ease;
-            touch-action: manipulation;
-            align-self: flex-start;
+            white-space: nowrap;
         }
 
         .remove-btn:hover {
             background: #dc2626;
         }
 
-        .results {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        .analytics-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
             color: white;
-            margin-bottom: 15px;
         }
 
-        .results h2 {
+        .analytics-panel .panel-title {
             color: white;
-            border-bottom-color: rgba(255, 255, 255, 0.3);
         }
 
-        .metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 12px 15px;
-            margin: 8px 0;
+        .analytics-panel .panel-header {
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-card {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-            flex-wrap: wrap;
-            gap: 8px;
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .metric-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: none;
         }
 
         .metric-label {
-            font-weight: 600;
-            font-size: 0.95rem;
-            line-height: 1.3;
-            flex: 1;
-            min-width: 150px;
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
 
         .metric-value {
-            font-size: 1.1rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            text-align: right;
-            word-break: break-all;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
         }
 
-        .breakeven-highlight {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            font-size: 1rem;
-            animation: pulse 2s infinite;
+        .metric-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 4px;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-
-        .room-settings {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            margin-bottom: 15px;
-        }
-
-        .room-settings h2 {
-            color: white;
-            border-bottom-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .room-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .room-input {
-            background: rgba(255, 255, 255, 0.1);
+        .warning-panel {
+            margin-top: 20px;
             padding: 15px;
             border-radius: 10px;
-            backdrop-filter: blur(5px);
+            border-left: 4px solid #f59e0b;
+            background: rgba(251, 191, 36, 0.1);
+            color: #92400e;
+            font-weight: 500;
         }
 
-        .room-input label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: white;
-            font-size: 0.9rem;
+        .tab-content {
+            display: none;
         }
 
-        .room-input input.number-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            font-size: 1rem;
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .kpi-card {
             background: rgba(255, 255, 255, 0.1);
-            color: white;
-            text-align: right;
-            min-height: 20px;
-            box-sizing: border-box;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .room-input input.number-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-            text-align: right;
+        .kpi-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
         }
 
-        .room-input input.number-input:focus {
-            outline: none;
-            border-color: rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.2);
+        .kpi-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
         }
 
         @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-                gap: 20px;
+            .header {
                 padding: 20px;
             }
             
@@ -286,114 +353,202 @@
                 font-size: 2rem;
             }
             
-            .room-grid {
+            .metrics-grid {
                 grid-template-columns: 1fr;
             }
-
-            .input-row {
+            
+            .dynamic-row {
                 flex-direction: column;
                 align-items: stretch;
             }
-
-            .input-row input[type="number"] {
-                width: 100%;
+            
+            .dynamic-row input {
+                margin-bottom: 8px;
             }
-        }
-
-        .warning {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
         <div class="header">
-            <h1>🏨 Hotel Business Breakeven Dashboard</h1>
-            <p>Calculate your minimum income requirements in Thai Baht (THB)</p>
+            <div class="header-content">
+                <h1>🏨 Hotel Financial Analytics Dashboard</h1>
+                <p>Professional Hotel Revenue Management & Breakeven Analysis</p>
+                
+                <div class="kpi-tabs">
+                    <button class="tab-btn active" onclick="showKPITab('revenue')">Revenue KPIs</button>
+                    <button class="tab-btn" onclick="showKPITab('operational')">Operational KPIs</button>
+                    <button class="tab-btn" onclick="showKPITab('financial')">Financial KPIs</button>
+                </div>
+
+                <div id="revenue-tab" class="tab-content active">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="adr-kpi">฿0</div>
+                        <div class="kpi-label">ADR (Average Daily Rate)</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="revpar-kpi">฿0</div>
+                        <div class="kpi-label">RevPAR (Revenue per Available Room)</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="trevpar-kpi">฿0</div>
+                        <div class="kpi-label">TRevPAR (Total Revenue per Available Room)</div>
+                    </div>
+                </div>
+
+                <div id="operational-tab" class="tab-content">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="occupancy-kpi">0%</div>
+                        <div class="kpi-label">Occupancy Rate</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="lpar-kpi">฿0</div>
+                        <div class="kpi-label">LPAR (Labor per Available Room)</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="cpor-kpi">฿0</div>
+                        <div class="kpi-label">CPOR (Cost per Occupied Room)</div>
+                    </div>
+                </div>
+
+                <div id="financial-tab" class="tab-content">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="goppar-kpi">฿0</div>
+                        <div class="kpi-label">GOPPAR (GOP per Available Room)</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="gop-margin-kpi">0%</div>
+                        <div class="kpi-label">GOP Margin</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="profpar-kpi">฿0</div>
+                        <div class="kpi-label">PROFPAR (Profit per Available Room)</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="content">
-            <div class="section room-settings">
-                <h2>🏨 Room & Pricing Settings</h2>
-                <div class="room-grid">
-                    <div class="room-input">
-                        <label>Total Rooms Available</label>
-                        <input type="text" class="number-input" id="totalRooms" placeholder="50" oninput="handleNumberInput(this)" onblur="saveData()">
+        <div class="content-grid">
+            <!-- Hotel Configuration Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">🏨 Hotel Configuration</div>
+                </div>
+                
+                <div class="input-section">
+                    <div class="section-label">Property Details</div>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label class="input-label">Total Rooms</label>
+                            <input type="text" class="input-field number-input" id="totalRooms" placeholder="100">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Average Daily Rate (ADR)</label>
+                            <input type="text" class="input-field number-input" id="adr" placeholder="3,500">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Target Occupancy (%)</label>
+                            <input type="text" class="input-field number-input" id="targetOccupancy" placeholder="75">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Commission/OTA Fees (%)</label>
+                            <input type="text" class="input-field number-input" id="commission" placeholder="15">
+                        </div>
                     </div>
-                    
-                    <div class="room-input">
-                        <label>Average Room Rate (THB)</label>
-                        <input type="text" class="number-input" id="roomRate" placeholder="4,000" oninput="handleNumberInput(this)" onblur="saveData()">
-                    </div>
-                    
-                    <div class="room-input">
-                        <label>Variable Cost per Room (THB)</label>
-                        <input type="text" class="number-input" id="variableCost" placeholder="800" oninput="handleNumberInput(this)" onblur="saveData()">
-                    </div>
-                    
-                    <div class="room-input">
-                        <label>Commission/OTA Fees (%)</label>
-                        <input type="text" class="number-input" id="commission" placeholder="15" oninput="handleNumberInput(this)" onblur="saveData()">
+                </div>
+
+                <div class="input-section">
+                    <div class="section-label">Variable Costs per Occupied Room</div>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label class="input-label">Housekeeping & Supplies</label>
+                            <input type="text" class="input-field number-input" id="housekeepingCost" placeholder="400">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Utilities per Room</label>
+                            <input type="text" class="input-field number-input" id="utilitiesPerRoom" placeholder="200">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Amenities & Linens</label>
+                            <input type="text" class="input-field number-input" id="amenitiesCost" placeholder="150">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Other Variable Costs</label>
+                            <input type="text" class="input-field number-input" id="otherVariableCosts" placeholder="100">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="section">
-                <h2>💰 Fixed Costs (Monthly) <button class="add-btn" onclick="addFixedCost()">+ Add Cost</button></h2>
-                <div id="fixedCosts">
-                    <!-- Fixed costs will be populated here -->
+            <!-- Fixed Operating Costs Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">💰 Fixed Operating Costs</div>
+                    <button class="add-btn" onclick="addFixedCost()">+ Add Cost</button>
                 </div>
+                <div id="fixedCosts"></div>
             </div>
 
-            <div class="section">
-                <h2>📊 Revenue Streams (Monthly) <button class="add-btn" onclick="addRevenue()">+ Add Revenue</button></h2>
-                <div id="revenues">
-                    <!-- Revenues will be populated here -->
+            <!-- Revenue Streams Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">📊 Revenue Streams</div>
+                    <button class="add-btn" onclick="addRevenue()">+ Add Stream</button>
                 </div>
+                <div id="revenues"></div>
             </div>
 
-            <div class="section results">
-                <h2>🎯 Breakeven Analysis Results</h2>
-                
-                <div class="metric">
-                    <span class="metric-label">Total Fixed Costs (Monthly)</span>
-                    <span class="metric-value" id="totalFixed">฿0</span>
+            <!-- Labor Costs Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">👥 Labor Costs</div>
+                    <button class="add-btn" onclick="addLaborCost()">+ Add Position</button>
+                </div>
+                <div id="laborCosts"></div>
+            </div>
+
+            <!-- Financial Analytics Panel -->
+            <div class="panel analytics-panel">
+                <div class="panel-header">
+                    <div class="panel-title">📈 Financial Performance Analysis</div>
                 </div>
                 
-                <div class="metric">
-                    <span class="metric-label">Contribution Margin per Room</span>
-                    <span class="metric-value" id="contributionMargin">฿0</span>
-                </div>
-                
-                <div class="metric breakeven-highlight">
-                    <span class="metric-label">🎯 Breakeven Rooms per Month</span>
-                    <span class="metric-value" id="breakevenRooms">0</span>
-                </div>
-                
-                <div class="metric breakeven-highlight">
-                    <span class="metric-label">🎯 Required Occupancy Rate</span>
-                    <span class="metric-value" id="occupancyRate">0%</span>
-                </div>
-                
-                <div class="metric">
-                    <span class="metric-label">Minimum Monthly Room Revenue</span>
-                    <span class="metric-value" id="minRoomRevenue">฿0</span>
-                </div>
-                
-                <div class="metric">
-                    <span class="metric-label">Total Monthly Revenue Needed</span>
-                    <span class="metric-value" id="totalRevNeeded">฿0</span>
-                </div>
-                
-                <div class="metric">
-                    <span class="metric-label">Safety Margin (20% above breakeven)</span>
-                    <span class="metric-value" id="safetyMargin">฿0</span>
+                <div class="metrics-grid">
+                    <div class="metric-card metric-primary">
+                        <div class="metric-label">Breakeven Occupancy</div>
+                        <div class="metric-value" id="breakevenOccupancy">0%</div>
+                        <div class="metric-subtitle">Required to break even</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-label">Monthly Revenue Needed</div>
+                        <div class="metric-value" id="revenueNeeded">฿0</div>
+                        <div class="metric-subtitle">To achieve breakeven</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-label">GOP (Gross Operating Profit)</div>
+                        <div class="metric-value" id="gop">฿0</div>
+                        <div class="metric-subtitle">At target occupancy</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-label">Contribution Margin</div>
+                        <div class="metric-value" id="contributionMargin">฿0</div>
+                        <div class="metric-subtitle">Per occupied room</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-label">Total Fixed Costs</div>
+                        <div class="metric-value" id="totalFixedCosts">฿0</div>
+                        <div class="metric-subtitle">Monthly operating expenses</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-label">Safety Margin Target</div>
+                        <div class="metric-value" id="safetyMargin">฿0</div>
+                        <div class="metric-subtitle">20% above breakeven</div>
+                    </div>
                 </div>
 
                 <div id="warningMessage"></div>
@@ -402,165 +557,303 @@
     </div>
 
     <script>
-        let fixedCostCounter = 0;
-        let revenueCounter = 0;
-
-        // Default fixed costs and revenues
+        // Industry standard default data based on research
         const defaultFixedCosts = [
-            { name: 'Rent/Mortgage', value: 500000 },
-            { name: 'Staff Salaries', value: 800000 },
-            { name: 'Insurance', value: 65000 },
-            { name: 'Utilities (Base)', value: 100000 },
-            { name: 'Marketing & Advertising', value: 130000 },
-            { name: 'Maintenance & Repairs', value: 80000 }
+            { name: 'Property Rent/Mortgage', value: 800000 },
+            { name: 'Staff Salaries (Fixed)', value: 1200000 },
+            { name: 'Property Insurance', value: 150000 },
+            { name: 'Property Taxes', value: 200000 },
+            { name: 'Base Utilities', value: 180000 },
+            { name: 'Marketing & Advertising', value: 250000 },
+            { name: 'Maintenance Contracts', value: 120000 },
+            { name: 'Administrative Expenses', value: 180000 },
+            { name: 'Technology & Software', value: 80000 },
+            { name: 'Professional Services', value: 100000 }
         ];
 
         const defaultRevenues = [
-            { name: 'Food & Beverage Revenue', value: 500000 },
-            { name: 'Spa & Wellness', value: 100000 },
-            { name: 'Event & Conference', value: 80000 },
-            { name: 'Parking & Other Services', value: 30000 }
+            { name: 'Food & Beverage', value: 2500000, margin: 25 },
+            { name: 'Spa & Wellness Services', value: 800000, margin: 60 },
+            { name: 'Event & Conference Spaces', value: 1200000, margin: 40 },
+            { name: 'Parking Services', value: 300000, margin: 80 },
+            { name: 'Laundry Services', value: 200000, margin: 35 },
+            { name: 'Business Center', value: 150000, margin: 70 },
+            { name: 'Retail & Gift Shop', value: 250000, margin: 50 },
+            { name: 'Tour & Excursion Services', value: 400000, margin: 30 }
         ];
 
-        function initializeDefaults() {
-            // Try to load saved data first
+        const defaultLaborCosts = [
+            { name: 'Front Office Staff', value: 450000 },
+            { name: 'Housekeeping', value: 600000 },
+            { name: 'Food & Beverage Staff', value: 800000 },
+            { name: 'Maintenance Staff', value: 300000 },
+            { name: 'Security', value: 250000 },
+            { name: 'Management', value: 500000 },
+            { name: 'Spa & Wellness Staff', value: 200000 },
+            { name: 'Event Coordination', value: 180000 }
+        ];
+
+        // Initialize dashboard
+        function init() {
             const savedData = loadData();
             
             if (savedData) {
-                // Load saved room settings
-                document.getElementById('totalRooms').value = savedData.totalRooms || '';
-                document.getElementById('roomRate').value = savedData.roomRate || '';
-                document.getElementById('variableCost').value = savedData.variableCost || '';
-                document.getElementById('commission').value = savedData.commission || '';
-
-                // Load saved fixed costs
-                if (savedData.fixedCosts && savedData.fixedCosts.length > 0) {
-                    savedData.fixedCosts.forEach(cost => {
-                        addFixedCost(cost.name, cost.value);
-                    });
-                } else {
-                    // Add defaults if no saved data
-                    defaultFixedCosts.forEach(cost => {
-                        addFixedCost(cost.name, formatNumberForDisplay(cost.value));
-                    });
-                }
-
-                // Load saved revenues
-                if (savedData.revenues && savedData.revenues.length > 0) {
-                    savedData.revenues.forEach(revenue => {
-                        addRevenue(revenue.name, revenue.value);
-                    });
-                } else {
-                    // Add defaults if no saved data
-                    defaultRevenues.forEach(revenue => {
-                        addRevenue(revenue.name, formatNumberForDisplay(revenue.value));
-                    });
-                }
+                loadSavedData(savedData);
             } else {
-                // Set default room settings
-                document.getElementById('totalRooms').value = '50';
-                document.getElementById('roomRate').value = '4,000';
-                document.getElementById('variableCost').value = '800';
-                document.getElementById('commission').value = '15';
-
-                // Add default fixed costs
-                defaultFixedCosts.forEach(cost => {
-                    addFixedCost(cost.name, formatNumberForDisplay(cost.value));
-                });
-
-                // Add default revenues
-                defaultRevenues.forEach(revenue => {
-                    addRevenue(revenue.name, formatNumberForDisplay(revenue.value));
-                });
+                setDefaults();
             }
-
-            calculateBreakeven();
+            
+            calculate();
         }
 
+        function setDefaults() {
+            // Set property defaults
+            document.getElementById('totalRooms').value = '120';
+            document.getElementById('adr').value = '3,500';
+            document.getElementById('targetOccupancy').value = '75';
+            document.getElementById('commission').value = '15';
+            document.getElementById('housekeepingCost').value = '400';
+            document.getElementById('utilitiesPerRoom').value = '200';
+            document.getElementById('amenitiesCost').value = '150';
+            document.getElementById('otherVariableCosts').value = '100';
+
+            // Add default costs and revenues
+            defaultFixedCosts.forEach(cost => addFixedCost(cost.name, formatNumber(cost.value)));
+            defaultRevenues.forEach(rev => addRevenue(rev.name, formatNumber(rev.value), rev.margin));
+            defaultLaborCosts.forEach(labor => addLaborCost(labor.name, formatNumber(labor.value)));
+        }
+
+        function loadSavedData(data) {
+            // Load property settings
+            Object.keys(data.property || {}).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) element.value = data.property[key];
+            });
+
+            // Load dynamic costs
+            (data.fixedCosts || []).forEach(cost => addFixedCost(cost.name, cost.value));
+            (data.revenues || []).forEach(rev => addRevenue(rev.name, rev.value, rev.margin));
+            (data.laborCosts || []).forEach(labor => addLaborCost(labor.name, labor.value));
+        }
+
+        // Dynamic row functions
         function addFixedCost(name = '', value = '') {
             const container = document.getElementById('fixedCosts');
             const row = document.createElement('div');
-            row.className = 'input-row';
+            row.className = 'dynamic-row';
             row.innerHTML = `
-                <input type="text" placeholder="Cost name (e.g., Insurance)" value="${name}" onchange="saveData()">
-                <div class="input-row-content">
-                    <input type="text" class="number-input" placeholder="0" value="${formatNumberForDisplay(value)}" oninput="handleNumberInput(this)" onblur="saveData()">
-                    <span style="min-width: 35px; text-align: center; font-size: 0.8rem;">THB</span>
-                    <button class="remove-btn" onclick="removeRow(this)">Remove</button>
-                </div>
+                <input type="text" class="input-field" placeholder="Cost category (e.g., Insurance)" value="${name}">
+                <input type="text" class="input-field number-input" placeholder="0" value="${value}" oninput="handleNumberInput(this)">
+                <span class="currency-label">THB</span>
+                <button class="remove-btn" onclick="removeRow(this)">Remove</button>
             `;
             container.appendChild(row);
-            fixedCostCounter++;
+            saveData();
         }
 
-        function addRevenue(name = '', value = '') {
+        function addRevenue(name = '', value = '', margin = '') {
             const container = document.getElementById('revenues');
             const row = document.createElement('div');
-            row.className = 'input-row';
+            row.className = 'dynamic-row';
             row.innerHTML = `
-                <input type="text" placeholder="Revenue source (e.g., Spa Services)" value="${name}" onchange="saveData()">
-                <div class="input-row-content">
-                    <input type="text" class="number-input" placeholder="Monthly Revenue" value="${formatNumberForDisplay(value)}" oninput="handleNumberInput(this)" onblur="saveData()">
-                    <span style="min-width: 35px; text-align: center; font-size: 0.8rem;">THB</span>
-                    <button class="remove-btn" onclick="removeRow(this)">Remove</button>
-                </div>
+                <input type="text" class="input-field" placeholder="Revenue stream (e.g., F&B)" value="${name}">
+                <input type="text" class="input-field number-input" placeholder="0" value="${value}" oninput="handleNumberInput(this)">
+                <input type="text" class="input-field number-input" placeholder="30" value="${margin}" oninput="handleNumberInput(this)" style="max-width: 80px;">
+                <span class="currency-label">THB</span>
+                <span class="currency-label">%</span>
+                <button class="remove-btn" onclick="removeRow(this)">Remove</button>
             `;
             container.appendChild(row);
-            revenueCounter++;
+            saveData();
+        }
+
+        function addLaborCost(name = '', value = '') {
+            const container = document.getElementById('laborCosts');
+            const row = document.createElement('div');
+            row.className = 'dynamic-row';
+            row.innerHTML = `
+                <input type="text" class="input-field" placeholder="Position/Department" value="${name}">
+                <input type="text" class="input-field number-input" placeholder="0" value="${value}" oninput="handleNumberInput(this)">
+                <span class="currency-label">THB</span>
+                <button class="remove-btn" onclick="removeRow(this)">Remove</button>
+            `;
+            container.appendChild(row);
+            saveData();
         }
 
         function removeRow(button) {
-            // Find the entire input-row container and remove it
-            const row = button.closest('.input-row');
-            if (row) {
-                row.remove();
-            }
+            button.closest('.dynamic-row').remove();
             saveData();
-            calculateBreakeven();
+            calculate();
         }
 
+        // Number formatting
         function handleNumberInput(input) {
-            // Remove all non-digit characters except decimal point
             let value = input.value.replace(/[^\d.]/g, '');
-            
-            // Handle decimal point
             let parts = value.split('.');
             if (parts.length > 2) {
                 value = parts[0] + '.' + parts.slice(1).join('');
             }
-            
-            // Format with commas
             if (parts[0]) {
                 parts[0] = parseInt(parts[0]).toLocaleString('en-US');
             }
-            
             input.value = parts.join('.');
-            calculateBreakeven();
+            calculate();
+            saveData();
         }
 
-        function getNumberValue(input) {
-            return parseFloat(input.value.replace(/,/g, '')) || 0;
+        function parseNumber(value) {
+            return parseFloat(value.replace(/,/g, '')) || 0;
         }
 
-        function formatNumberForDisplay(value) {
-            if (!value || value === '') return '';
+        function formatNumber(value) {
+            if (!value) return '';
             const num = parseFloat(value);
             return isNaN(num) ? '' : num.toLocaleString('en-US');
         }
 
+        // KPI Tab functionality
+        function showKPITab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // Main calculation function
+        function calculate() {
+            // Get property values
+            const totalRooms = parseNumber(document.getElementById('totalRooms').value) || 120;
+            const adr = parseNumber(document.getElementById('adr').value) || 3500;
+            const targetOccupancy = parseNumber(document.getElementById('targetOccupancy').value) || 75;
+            const commission = parseNumber(document.getElementById('commission').value) || 15;
+            
+            // Variable costs per room
+            const housekeeping = parseNumber(document.getElementById('housekeepingCost').value) || 0;
+            const utilities = parseNumber(document.getElementById('utilitiesPerRoom').value) || 0;
+            const amenities = parseNumber(document.getElementById('amenitiesCost').value) || 0;
+            const otherVariable = parseNumber(document.getElementById('otherVariableCosts').value) || 0;
+            const totalVariableCostPerRoom = housekeeping + utilities + amenities + otherVariable;
+
+            // Calculate fixed costs
+            let totalFixedCosts = 0;
+            document.querySelectorAll('#fixedCosts .dynamic-row').forEach(row => {
+                const inputs = row.querySelectorAll('.number-input');
+                if (inputs.length > 0) {
+                    totalFixedCosts += parseNumber(inputs[0].value);
+                }
+            });
+
+            // Calculate labor costs
+            let totalLaborCosts = 0;
+            document.querySelectorAll('#laborCosts .dynamic-row').forEach(row => {
+                const inputs = row.querySelectorAll('.number-input');
+                if (inputs.length > 0) {
+                    totalLaborCosts += parseNumber(inputs[0].value);
+                }
+            });
+
+            // Calculate ancillary revenue
+            let totalAncillaryRevenue = 0;
+            let totalAncillaryProfit = 0;
+            document.querySelectorAll('#revenues .dynamic-row').forEach(row => {
+                const inputs = row.querySelectorAll('.number-input');
+                if (inputs.length >= 2) {
+                    const revenue = parseNumber(inputs[0].value);
+                    const margin = parseNumber(inputs[1].value) || 30;
+                    totalAncillaryRevenue += revenue;
+                    totalAncillaryProfit += revenue * (margin / 100);
+                }
+            });
+
+            // Core calculations
+            const totalMonthlyFixedCosts = totalFixedCosts + totalLaborCosts;
+            const effectiveADR = adr * (1 - commission / 100);
+            const contributionMarginPerRoom = effectiveADR - totalVariableCostPerRoom;
+            
+            // Net fixed costs after ancillary profit
+            const netFixedCosts = Math.max(0, totalMonthlyFixedCosts - totalAncillaryProfit);
+            
+            // Breakeven calculations
+            const breakevenRoomsPerMonth = contributionMarginPerRoom > 0 ? Math.ceil(netFixedCosts / contributionMarginPerRoom) : 0;
+            const maxRoomsPerMonth = totalRooms * 30;
+            const breakevenOccupancyRate = maxRoomsPerMonth > 0 ? (breakevenRoomsPerMonth / maxRoomsPerMonth) * 100 : 0;
+            
+            // Revenue calculations
+            const monthlyRoomRevenue = (totalRooms * 30 * (targetOccupancy / 100)) * effectiveADR;
+            const totalMonthlyRevenue = monthlyRoomRevenue + totalAncillaryRevenue;
+            const breakevenRevenue = breakevenRoomsPerMonth * effectiveADR + totalAncillaryRevenue;
+            
+            // Profitability calculations
+            const monthlyVariableCosts = (totalRooms * 30 * (targetOccupancy / 100)) * totalVariableCostPerRoom;
+            const monthlyAncillaryCosts = totalAncillaryRevenue - totalAncillaryProfit;
+            const totalMonthlyCosts = totalMonthlyFixedCosts + monthlyVariableCosts + monthlyAncillaryCosts;
+            const gop = totalMonthlyRevenue - totalMonthlyCosts;
+            const gopMargin = totalMonthlyRevenue > 0 ? (gop / totalMonthlyRevenue) * 100 : 0;
+            
+            // Industry KPIs
+            const revpar = (totalRooms * 30) > 0 ? monthlyRoomRevenue / (totalRooms * 30) : 0;
+            const trevpar = (totalRooms * 30) > 0 ? totalMonthlyRevenue / (totalRooms * 30) : 0;
+            const goppar = (totalRooms * 30) > 0 ? gop / (totalRooms * 30) : 0;
+            const lpar = (totalRooms * 30) > 0 ? totalLaborCosts / (totalRooms * 30) : 0;
+            const cpor = (targetOccupancy > 0) ? (totalMonthlyCosts / (totalRooms * 30 * (targetOccupancy / 100))) : 0;
+            const profpar = goppar; // Same as GOPPAR for simplicity
+            
+            // Update main analytics
+            document.getElementById('breakevenOccupancy').textContent = `${breakevenOccupancyRate.toFixed(1)}%`;
+            document.getElementById('revenueNeeded').textContent = `฿${breakevenRevenue.toLocaleString()}`;
+            document.getElementById('gop').textContent = `฿${gop.toLocaleString()}`;
+            document.getElementById('contributionMargin').textContent = `฿${contributionMarginPerRoom.toLocaleString()}`;
+            document.getElementById('totalFixedCosts').textContent = `฿${totalMonthlyFixedCosts.toLocaleString()}`;
+            document.getElementById('safetyMargin').textContent = `฿${(breakevenRevenue * 1.2).toLocaleString()}`;
+
+            // Update KPI tabs
+            document.getElementById('adr-kpi').textContent = `฿${effectiveADR.toLocaleString()}`;
+            document.getElementById('revpar-kpi').textContent = `฿${revpar.toLocaleString()}`;
+            document.getElementById('trevpar-kpi').textContent = `฿${trevpar.toLocaleString()}`;
+            document.getElementById('occupancy-kpi').textContent = `${targetOccupancy}%`;
+            document.getElementById('lpar-kpi').textContent = `฿${lpar.toLocaleString()}`;
+            document.getElementById('cpor-kpi').textContent = `฿${cpor.toLocaleString()}`;
+            document.getElementById('goppar-kpi').textContent = `฿${goppar.toLocaleString()}`;
+            document.getElementById('gop-margin-kpi').textContent = `${gopMargin.toFixed(1)}%`;
+            document.getElementById('profpar-kpi').textContent = `฿${profpar.toLocaleString()}`;
+
+            // Warning messages
+            const warningDiv = document.getElementById('warningMessage');
+            warningDiv.innerHTML = '';
+            
+            if (breakevenOccupancyRate > 100) {
+                warningDiv.innerHTML = '<div class="warning-panel">⚠️ Critical: Required occupancy exceeds 100%! Consider reducing costs or increasing ADR.</div>';
+            } else if (breakevenOccupancyRate > 85) {
+                warningDiv.innerHTML = '<div class="warning-panel">⚠️ High Risk: Breakeven requires >85% occupancy. Consider optimizing cost structure.</div>';
+            } else if (gop < 0) {
+                warningDiv.innerHTML = '<div class="warning-panel">❌ Loss Making: Current projections show negative GOP. Immediate action required.</div>';
+            } else if (breakevenOccupancyRate < 50 && gop > 0) {
+                warningDiv.innerHTML = '<div class="warning-panel" style="border-color: #10b981; background: rgba(16, 185, 129, 0.1); color: #047857;">✅ Excellent: Strong financial position with healthy profit margins.</div>';
+            }
+        }
+
+        // Data persistence
         function saveData() {
             const data = {
-                totalRooms: document.getElementById('totalRooms').value,
-                roomRate: document.getElementById('roomRate').value,
-                variableCost: document.getElementById('variableCost').value,
-                commission: document.getElementById('commission').value,
+                property: {
+                    totalRooms: document.getElementById('totalRooms').value,
+                    adr: document.getElementById('adr').value,
+                    targetOccupancy: document.getElementById('targetOccupancy').value,
+                    commission: document.getElementById('commission').value,
+                    housekeepingCost: document.getElementById('housekeepingCost').value,
+                    utilitiesPerRoom: document.getElementById('utilitiesPerRoom').value,
+                    amenitiesCost: document.getElementById('amenitiesCost').value,
+                    otherVariableCosts: document.getElementById('otherVariableCosts').value
+                },
                 fixedCosts: [],
-                revenues: []
+                revenues: [],
+                laborCosts: []
             };
 
-            // Save fixed costs
-            const fixedCostInputs = document.querySelectorAll('#fixedCosts .input-row');
-            fixedCostInputs.forEach(row => {
+            // Save dynamic data
+            document.querySelectorAll('#fixedCosts .dynamic-row').forEach(row => {
                 const inputs = row.querySelectorAll('input');
                 if (inputs.length >= 2) {
                     data.fixedCosts.push({
@@ -570,99 +863,47 @@
                 }
             });
 
-            // Save revenues
-            const revenueInputs = document.querySelectorAll('#revenues .input-row');
-            revenueInputs.forEach(row => {
+            document.querySelectorAll('#revenues .dynamic-row').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 3) {
+                    data.revenues.push({
+                        name: inputs[0].value,
+                        value: inputs[1].value,
+                        margin: inputs[2].value
+                    });
+                }
+            });
+
+            document.querySelectorAll('#laborCosts .dynamic-row').forEach(row => {
                 const inputs = row.querySelectorAll('input');
                 if (inputs.length >= 2) {
-                    data.revenues.push({
+                    data.laborCosts.push({
                         name: inputs[0].value,
                         value: inputs[1].value
                     });
                 }
             });
 
-            // Store in memory (no localStorage in Claude.ai environment)
             window.hotelData = data;
         }
 
         function loadData() {
-            // In a real environment, you would load from localStorage here
-            // For Claude.ai, we'll use in-memory storage
             return window.hotelData || null;
         }
 
-        function calculateBreakeven() {
-            // Get room settings using new function
-            const totalRooms = getNumberValue(document.getElementById('totalRooms')) || 1;
-            const roomRate = getNumberValue(document.getElementById('roomRate')) || 0;
-            const variableCost = getNumberValue(document.getElementById('variableCost')) || 0;
-            const commission = getNumberValue(document.getElementById('commission')) || 0;
-
-            // Calculate total fixed costs
-            let totalFixedCosts = 0;
-            const fixedCostInputs = document.querySelectorAll('#fixedCosts .input-row');
-            fixedCostInputs.forEach(row => {
-                const inputs = row.querySelectorAll('input.number-input');
-                if (inputs.length > 0) {
-                    totalFixedCosts += getNumberValue(inputs[0]);
-                }
-            });
-
-            // Calculate net other revenue (now just total revenue since no variable costs)
-            let totalOtherRevenue = 0;
-            const revenueInputs = document.querySelectorAll('#revenues .input-row');
-            revenueInputs.forEach(row => {
-                const inputs = row.querySelectorAll('input.number-input');
-                if (inputs.length > 0) {
-                    totalOtherRevenue += getNumberValue(inputs[0]);
-                }
-            });
-
-            // Effective room rate after commission
-            const effectiveRoomRate = roomRate * (1 - commission / 100);
-            
-            // Contribution margin per room
-            const contributionMargin = effectiveRoomRate - variableCost;
-            
-            // Net fixed costs (after other revenue contributions)
-            const netFixedCosts = Math.max(0, totalFixedCosts - totalOtherRevenue);
-            
-            // Breakeven calculations
-            const breakevenRooms = contributionMargin > 0 ? Math.ceil(netFixedCosts / contributionMargin) : 0;
-            const maxRoomsPerMonth = totalRooms * 30;
-            const occupancyRate = maxRoomsPerMonth > 0 ? (breakevenRooms / maxRoomsPerMonth) * 100 : 0;
-            
-            const minRoomRevenue = breakevenRooms * effectiveRoomRate;
-            const totalRevNeeded = minRoomRevenue + totalOtherRevenue;
-            const safetyMargin = totalRevNeeded * 1.2;
-
-            // Update display with comma formatting
-            document.getElementById('totalFixed').textContent = `฿${totalFixedCosts.toLocaleString('en-US')}`;
-            document.getElementById('contributionMargin').textContent = `฿${contributionMargin.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            document.getElementById('breakevenRooms').textContent = breakevenRooms.toLocaleString('en-US');
-            document.getElementById('occupancyRate').textContent = `${occupancyRate.toFixed(1)}%`;
-            document.getElementById('minRoomRevenue').textContent = `฿${minRoomRevenue.toLocaleString('en-US')}`;
-            document.getElementById('totalRevNeeded').textContent = `฿${totalRevNeeded.toLocaleString('en-US')}`;
-            document.getElementById('safetyMargin').textContent = `฿${safetyMargin.toLocaleString('en-US')}`;
-
-            // Warning messages
-            const warningDiv = document.getElementById('warningMessage');
-            warningDiv.innerHTML = '';
-            
-            if (occupancyRate > 100) {
-                warningDiv.innerHTML = '<div class="warning">⚠️ Warning: Required occupancy rate exceeds 100%! Consider reducing costs or increasing room rates.</div>';
-            } else if (occupancyRate > 85) {
-                warningDiv.innerHTML = '<div class="warning">⚠️ Caution: High occupancy rate required (>85%). Consider optimizing your cost structure.</div>';
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Add event listeners for property inputs
+        ['totalRooms', 'adr', 'targetOccupancy', 'commission', 'housekeepingCost', 'utilitiesPerRoom', 'amenitiesCost', 'otherVariableCosts'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', function() { 
+                    handleNumberInput(this); 
+                });
+                element.addEventListener('blur', saveData);
             }
-            
-            if (contributionMargin <= 0) {
-                warningDiv.innerHTML = '<div class="warning">❌ Critical: Negative contribution margin! Room rate is too low or variable costs too high.</div>';
-            }
-        }
-
-        // Initialize on page load
-        window.onload = initializeDefaults;
+        });
     </script>
 </body>
 </html>
