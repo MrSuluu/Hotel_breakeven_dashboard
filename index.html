@@ -55,10 +55,10 @@
       localStorage.setItem('hotelAppData', JSON.stringify(appData.entries));
     }
 
-    window.onload = function () {
-      updateDashboard();
-      setupNavLinks();
-    };
+    document.addEventListener("DOMContentLoaded", function () {
+  updateDashboard();
+  setupNavLinks();
+});
 
     function updateDashboard() {
       const currentMonth = new Date().toISOString().slice(0, 7);
