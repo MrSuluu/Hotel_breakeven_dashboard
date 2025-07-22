@@ -92,6 +92,11 @@
     <div class="card">Coming soon...</div>
   </div>
   <script>
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
+
     window.addEventListener("DOMContentLoaded", function () {
       let appData = {
         entries: JSON.parse(localStorage.getItem('hotelAppData')) || [],
@@ -113,11 +118,6 @@
         document.getElementById('total-revenue').textContent = totalRevenue.toFixed(2);
         document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2);
         document.getElementById('net-profit').textContent = `฿${netProfit.toFixed(2)}`;
-      }
-
-      function showPage(pageId) {
-        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
       }
 
       function setupNavLinks() {
