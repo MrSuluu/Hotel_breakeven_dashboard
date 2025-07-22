@@ -1,259 +1,932 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hotel Financial Tracker (THB)</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      background: #f8f9fa;
-    }
-    nav {
-      background: #2c3e50;
-      padding: 1rem;
-      display: flex;
-      gap: 1rem;
-    }
-    .nav-link {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .nav-link.active {
-      background: #2980b9;
-      font-weight: bold;
-    }
-    .page {
-      display: none;
-      padding: 2rem;
-    }
-    .page.active {
-      display: block;
-    }
-    .card {
-      background: white;
-      padding: 1rem;
-      margin: 1rem 0;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .card-title {
-      font-size: 0.9rem;
-      color: #555;
-    }
-    .card-value {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-top: 0.25rem;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    input, select, button {
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-    }
-    .action-btn {
-      margin-right: 0.5rem;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.9rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Financial Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border-radius: 0;
+        }
+
+        .nav-link:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .nav-link:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: rgba(255,255,255,0.3);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .profit-positive {
+            color: #27ae60;
+        }
+
+        .profit-negative {
+            color: #e74c3c;
+        }
+
+        .breakeven-message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .breakeven-success {
+            background: #d5edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .breakeven-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* Forms */
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Revenue Sources */
+        .revenue-sources {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Cost Sections */
+        .cost-section {
+            margin-bottom: 2rem;
+        }
+
+        .cost-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .cost-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: end;
+        }
+
+        .cost-item .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Chart Placeholder */
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+            }
+
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                border-radius: 8px !important;
+                text-align: center;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .revenue-sources {
+                grid-template-columns: 1fr;
+            }
+
+            .cost-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .data-table {
+                font-size: 0.9rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- [Your HTML content remains unchanged above] -->
-  <script>
-    function showPage(pageId) {
-      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
-      if (pageId === 'revenue') renderTable('revenue');
-      if (pageId === 'expenses') renderTable('expense');
-    }
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-brand">🏨 Hotel Financial Tracker</div>
+            <div class="nav-links">
+                <button class="nav-link active" onclick="showPage('dashboard')">📊 Dashboard</button>
+                <button class="nav-link" onclick="showPage('revenue')">💰 Revenue</button>
+                <button class="nav-link" onclick="showPage('expenses')">📋 Expenses</button>
+                <button class="nav-link" onclick="showPage('reports')">📈 Reports</button>
+            </div>
+        </nav>
 
-    window.showPage = showPage;
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <h1 class="page-title">Dashboard Overview</h1>
+                
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-title">Monthly Breakeven Target</div>
+                        <div class="card-value">$<span id="breakeven-target">5,000</span></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">Total Revenue This Month</div>
+                        <div class="card-value">$<span id="total-revenue">0</span></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">Total Expenses This Month</div>
+                        <div class="card-value">$<span id="total-expenses">0</span></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">Net Profit</div>
+                        <div class="card-value" id="net-profit">$0</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">Occupancy Rate</div>
+                        <div class="card-value"><span id="occupancy-rate">0</span>%</div>
+                    </div>
+                </div>
 
-    window.addEventListener("DOMContentLoaded", function () {
-      const waitForEl = id => new Promise(resolve => {
-        const check = () => {
-          const el = document.getElementById(id);
-          if (el) resolve(el);
-          else setTimeout(check, 50);
-        };
-        check();
-      });
+                <div id="breakeven-message" class="breakeven-message" style="display: none;"></div>
 
-      const init = async () => {
-        await waitForEl("revenue-form");
-        await waitForEl("expense-form");
-        await waitForEl("revenue-date");
-        await waitForEl("expense-date");
-        await waitForEl("report-month");
+                <div class="chart-container">
+                    <h3>Revenue vs Expenses</h3>
+                    <div class="chart-placeholder">
+                        📊 Chart visualization will appear here<br>
+                        <small>Connect to Chart.js or similar library for live charts</small>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Revenue Page -->
+            <div id="revenue" class="page">
+                <h1 class="page-title">Revenue Entry</h1>
+                
+                <div class="form-container">
+                    <form id="revenue-form">
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-input" id="revenue-date" required>
+                        </div>
+
+                        <h3 style="margin: 2rem 0 1rem 0; color: #2c3e50;">Revenue Sources</h3>
+                        <div class="revenue-sources">
+                            <div class="form-group">
+                                <label class="form-label">Agoda</label>
+                                <input type="number" class="form-input" id="revenue-agoda" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Booking.com</label>
+                                <input type="number" class="form-input" id="revenue-booking" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Walk-in</label>
+                                <input type="number" class="form-input" id="revenue-walkin" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Other</label>
+                                <input type="number" class="form-input" id="revenue-other" placeholder="0.00" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Occupancy Rate (%)</label>
+                            <input type="number" class="form-input" id="occupancy-input" placeholder="85" min="0" max="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Notes (Optional)</label>
+                            <textarea class="form-input" id="revenue-notes" rows="3" placeholder="Additional notes about today's revenue..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn">💾 Save Revenue Entry</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Expenses Page -->
+            <div id="expenses" class="page">
+                <h1 class="page-title">Cost & Expense Entry</h1>
+                
+                <div class="form-container">
+                    <form id="expense-form">
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-input" id="expense-date" required>
+                        </div>
+
+                        <!-- Fixed Costs Section -->
+                        <div class="cost-section">
+                            <h3>Fixed Costs</h3>
+                            <div id="fixed-costs">
+                                <div class="cost-item">
+                                    <div class="form-group">
+                                        <label class="form-label">Cost Name</label>
+                                        <input type="text" class="form-input" placeholder="e.g., Rent, Insurance" name="fixed-name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Amount</label>
+                                        <input type="number" class="form-input" placeholder="0.00" step="0.01" name="fixed-amount">
+                                    </div>
+                                    <button type="button" class="btn btn-danger" onclick="removeFixedCost(this)">❌</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn" onclick="addFixedCost()">➕ Add Fixed Cost</button>
+                        </div>
+
+                        <!-- Variable Costs Section -->
+                        <div class="cost-section">
+                            <h3>Variable Costs</h3>
+                            <div id="variable-costs">
+                                <div class="cost-item">
+                                    <div class="form-group">
+                                        <label class="form-label">Cost Name</label>
+                                        <input type="text" class="form-input" placeholder="e.g., Utilities, Supplies" name="variable-name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Amount</label>
+                                        <input type="number" class="form-input" placeholder="0.00" step="0.01" name="variable-amount">
+                                    </div>
+                                    <button type="button" class="btn btn-danger" onclick="removeVariableCost(this)">❌</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn" onclick="addVariableCost()">➕ Add Variable Cost</button>
+                        </div>
+
+                        <button type="submit" class="btn">💾 Save Expense Entry</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="reports" class="page">
+                <h1 class="page-title">Financial Reports</h1>
+                
+                <div class="filters">
+                    <div class="form-group">
+                        <label class="form-label">Filter by Month</label>
+                        <input type="month" class="form-input" id="report-month">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Entry Type</label>
+                        <select class="form-input" id="report-type">
+                            <option value="all">All Entries</option>
+                            <option value="revenue">Revenue Only</option>
+                            <option value="expense">Expenses Only</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="filterReports()">🔍 Apply Filters</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Source/Category</th>
+                                <th>Amount</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-tbody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #6c757d; padding: 2rem;">
+                                    No entries found. Start by adding revenue or expense data.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
         let appData = {
-          entries: JSON.parse(localStorage.getItem('hotelAppData')) || [],
-          breakevenTarget: 5000,
-          editIndex: null
+            entries: [],
+            breakevenTarget: 5000
         };
 
-        function saveToLocalStorage() {
-          localStorage.setItem('hotelAppData', JSON.stringify(appData.entries));
-        }
-
-        function updateDashboard() {
-          const currentMonth = new Date().toISOString().slice(0, 7);
-          const monthlyEntries = appData.entries.filter(entry => entry.date && entry.date.startsWith(currentMonth));
-
-          const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
-          const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
-          const netProfit = totalRevenue - totalExpenses;
-
-          document.getElementById('total-revenue').textContent = totalRevenue.toFixed(2);
-          document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2);
-          document.getElementById('net-profit').textContent = `฿${netProfit.toFixed(2)}`;
-        }
-
-        function updateReport(month) {
-          const monthlyEntries = appData.entries.filter(entry => entry.date && entry.date.startsWith(month));
-
-          const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
-          const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
-          const netProfit = totalRevenue - totalExpenses;
-
-          document.getElementById('report-revenue').textContent = `฿${totalRevenue.toFixed(2)}`;
-          document.getElementById('report-expenses').textContent = `฿${totalExpenses.toFixed(2)}`;
-          document.getElementById('report-net').textContent = `฿${netProfit.toFixed(2)}`;
-        }
-
-        function renderTable(type) {
-          const table = document.getElementById(`${type}-table`);
-          const entries = appData.entries.filter(e => e.type === type);
-          table.innerHTML = `
-            <thead>
-              <tr><th>Description</th><th>Amount (฿)</th><th>Date</th><th>Actions</th></tr>
-            </thead>
-            <tbody>
-              ${entries.map((e, i) => `
-                <tr>
-                  <td>${e.description}</td>
-                  <td>${e.total.toFixed(2)}</td>
-                  <td>${e.date}</td>
-                  <td>
-                    <button class="action-btn" onclick="editEntry(${i})">✏️</button>
-                    <button class="action-btn" onclick="deleteEntry(${i})">🗑️</button>
-                  </td>
-                </tr>`).join('')}
-            </tbody>
-          `;
-        }
-
-        window.renderTable = renderTable;
-
-        window.editEntry = function(index) {
-          const entry = appData.entries[index];
-          appData.editIndex = index;
-          const descInput = document.getElementById(`${entry.type}-desc`);
-          const amtInput = document.getElementById(`${entry.type}-amount`);
-          const dateInput = document.getElementById(`${entry.type}-date`);
-          showPage(entry.type === 'revenue' ? 'revenue' : 'expenses');
-          descInput.value = entry.description;
-          amtInput.value = entry.total;
-          dateInput.value = entry.date;
-        };
-
-        window.deleteEntry = function(index) {
-          appData.entries.splice(index, 1);
-          saveToLocalStorage();
-          updateDashboard();
-          renderTable('revenue');
-          renderTable('expense');
-        };
-
-        function setupNavLinks() {
-          const navLinks = document.querySelectorAll('.nav-link');
-          navLinks.forEach(link => {
-            link.addEventListener('click', function () {
-              navLinks.forEach(l => l.classList.remove('active'));
-              this.classList.add('active');
+        // Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
             });
-          });
+
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+
+            // Update dashboard when showing dashboard page
+            if (pageId === 'dashboard') {
+                updateDashboard();
+            }
+
+            // Update reports when showing reports page
+            if (pageId === 'reports') {
+                updateReports();
+            }
         }
 
-        document.getElementById("revenue-form").addEventListener("submit", function (e) {
-          e.preventDefault();
-          const desc = document.getElementById("revenue-desc").value;
-          const amount = parseFloat(document.getElementById("revenue-amount").value);
-          const date = document.getElementById("revenue-date").value;
-          const newEntry = { type: "revenue", description: desc, total: amount, date };
+        // Set today's date as default
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('revenue-date').value = today;
+            document.getElementById('expense-date').value = today;
+        }
 
-          if (appData.editIndex !== null) {
-            appData.entries[appData.editIndex] = newEntry;
-            appData.editIndex = null;
-          } else {
-            appData.entries.push(newEntry);
-          }
+        // Revenue Form Submission
+        document.getElementById('revenue-form').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-          saveToLocalStorage();
-          updateDashboard();
-          renderTable('revenue');
-          this.reset();
-          document.getElementById("revenue-date").value = new Date().toISOString().slice(0, 10);
-          alert("Revenue saved!");
+            const date = document.getElementById('revenue-date').value;
+            const agoda = parseFloat(document.getElementById('revenue-agoda').value) || 0;
+            const booking = parseFloat(document.getElementById('revenue-booking').value) || 0;
+            const walkin = parseFloat(document.getElementById('revenue-walkin').value) || 0;
+            const other = parseFloat(document.getElementById('revenue-other').value) || 0;
+            const occupancy = parseFloat(document.getElementById('occupancy-input').value) || 0;
+            const notes = document.getElementById('revenue-notes').value;
+
+            const totalRevenue = agoda + booking + walkin + other;
+
+            if (totalRevenue > 0) {
+                const entry = {
+                    id: Date.now(),
+                    date: date,
+                    type: 'revenue',
+                    sources: { agoda, booking, walkin, other },
+                    total: totalRevenue,
+                    occupancy: occupancy,
+                    notes: notes
+                };
+
+                appData.entries.push(entry);
+                alert('Revenue entry saved successfully!');
+                this.reset();
+                setDefaultDates();
+                updateDashboard();
+            } else {
+                alert('Please enter at least one revenue amount.');
+            }
         });
 
-        document.getElementById("expense-form").addEventListener("submit", function (e) {
-          e.preventDefault();
-          const desc = document.getElementById("expense-desc").value;
-          const amount = parseFloat(document.getElementById("expense-amount").value);
-          const date = document.getElementById("expense-date").value;
-          const newEntry = { type: "expense", description: desc, total: amount, date };
+        // Expense Form Submission
+        document.getElementById('expense-form').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-          if (appData.editIndex !== null) {
-            appData.entries[appData.editIndex] = newEntry;
-            appData.editIndex = null;
-          } else {
-            appData.entries.push(newEntry);
-          }
+            const date = document.getElementById('expense-date').value;
+            const fixedCosts = [];
+            const variableCosts = [];
 
-          saveToLocalStorage();
-          updateDashboard();
-          renderTable('expense');
-          this.reset();
-          document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
-          alert("Expense saved!");
+            // Collect fixed costs
+            document.querySelectorAll('#fixed-costs .cost-item').forEach(item => {
+                const name = item.querySelector('input[name="fixed-name"]').value;
+                const amount = parseFloat(item.querySelector('input[name="fixed-amount"]').value) || 0;
+                if (name && amount > 0) {
+                    fixedCosts.push({ name, amount });
+                }
+            });
+
+            // Collect variable costs
+            document.querySelectorAll('#variable-costs .cost-item').forEach(item => {
+                const name = item.querySelector('input[name="variable-name"]').value;
+                const amount = parseFloat(item.querySelector('input[name="variable-amount"]').value) || 0;
+                if (name && amount > 0) {
+                    variableCosts.push({ name, amount });
+                }
+            });
+
+            const totalExpenses = [...fixedCosts, ...variableCosts].reduce((sum, cost) => sum + cost.amount, 0);
+
+            if (totalExpenses > 0) {
+                const entry = {
+                    id: Date.now(),
+                    date: date,
+                    type: 'expense',
+                    fixedCosts: fixedCosts,
+                    variableCosts: variableCosts,
+                    total: totalExpenses
+                };
+
+                appData.entries.push(entry);
+                alert('Expense entry saved successfully!');
+                this.reset();
+                setDefaultDates();
+                addFixedCost();
+                addVariableCost();
+                updateDashboard();
+            } else {
+                alert('Please enter at least one expense.');
+            }
         });
 
-        document.getElementById("revenue-date").value = new Date().toISOString().slice(0, 10);
-        document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
-        document.getElementById("report-month").value = new Date().toISOString().slice(0, 7);
+        // Add/Remove Cost Items
+        function addFixedCost() {
+            const container = document.getElementById('fixed-costs');
+            const newItem = document.createElement('div');
+            newItem.className = 'cost-item';
+            newItem.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Cost Name</label>
+                    <input type="text" class="form-input" placeholder="e.g., Rent, Insurance" name="fixed-name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount</label>
+                    <input type="number" class="form-input" placeholder="0.00" step="0.01" name="fixed-amount">
+                </div>
+                <button type="button" class="btn btn-danger" onclick="removeFixedCost(this)">❌</button>
+            `;
+            container.appendChild(newItem);
+        }
 
-        document.getElementById("report-month").addEventListener("change", function () {
-          updateReport(this.value);
-        });
+        function addVariableCost() {
+            const container = document.getElementById('variable-costs');
+            const newItem = document.createElement('div');
+            newItem.className = 'cost-item';
+            newItem.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Cost Name</label>
+                    <input type="text" class="form-input" placeholder="e.g., Utilities, Supplies" name="variable-name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount</label>
+                    <input type="number" class="form-input" placeholder="0.00" step="0.01" name="variable-amount">
+                </div>
+                <button type="button" class="btn btn-danger" onclick="removeVariableCost(this)">❌</button>
+            `;
+            container.appendChild(newItem);
+        }
 
-        updateDashboard();
-        updateReport(new Date().toISOString().slice(0, 7));
-        setupNavLinks();
-      };
+        function removeFixedCost(button) {
+            if (document.querySelectorAll('#fixed-costs .cost-item').length > 1) {
+                button.parentNode.remove();
+            }
+        }
 
-      init();
-    });
-  </script>
-</body>
-</html>
+        function removeVariableCost(button) {
+            if (document.querySelectorAll('#variable-costs .cost-item').length > 1) {
+                button.parentNode.remove();
+            }
+        }
+
+        // Update Dashboard
+        function updateDashboard() {
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const monthlyEntries = appData.entries.filter(entry => entry.date.startsWith(currentMonth));
+            
+            const totalRevenue = monthlyEntries
+                .filter(entry => entry.type === 'revenue')
+                .reduce((sum, entry) => sum + entry.total, 0);
+                
+            const totalExpenses = monthlyEntries
+                .filter(entry => entry.type === 'expense')
+                .reduce((sum, entry) => sum + entry.total, 0);
+                
+            const netProfit = totalRevenue - totalExpenses;
+            
+            // Get latest occupancy rate
+            const latestRevenueEntry = monthlyEntries
+                .filter(entry => entry.type === 'revenue' && entry.occupancy)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+            const occupancyRate = latestRevenueEntry ? latestRevenueEntry.occupancy : 0;
+
+            // Update UI
+            document.getElementById('total-revenue').textContent = totalRevenue.toFixed(2);
+            document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2);
+            document.getElementById('occupancy-rate').textContent = occupancyRate.toFixed(1);
+            
+            const netProfitElement = document.getElementById('net-profit');
+            netProfitElement.textContent = `$${netProfit.toFixed(2)}`;
+            netProfitElement.className = `card-value ${netProfit >= 0 ? 'profit-positive' : 'profit-negative'}`;
+
+            // Breakeven message
+            const messageElement = document.getElementById('breakeven-message');
+            if (netProfit >= appData.breakevenTarget) {
+                messageElement.innerHTML = `🎉 Congratulations! You're ${((netProfit - appData.breakevenTarget)).toFixed(2)} above your breakeven target!`;
+                messageElement.className = 'breakeven-message breakeven-success';
+                messageElement.style.display = 'block';
+            } else if (totalRevenue > 0) {
+                const shortfall = appData.breakevenTarget - netProfit;
+                messageElement.innerHTML = `⚠️ You need $${shortfall.toFixed(2)} more to reach your breakeven target.`;
+                messageElement.className = 'breakeven-message breakeven-warning';
+                messageElement.style.display = 'block';
+            } else {
+                messageElement.style.display = 'none';
+            }
+        }
+
+        // Update Reports
+        function updateReports() {
+            const tbody = document.getElementById('reports-tbody');
+            tbody.innerHTML = '';
+
+            if (appData.entries.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #6c757d; padding: 2rem;">
+                            No entries found. Start by adding revenue or expense data.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const sortedEntries = appData.entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedEntries.forEach(entry => {
+                if (entry.type === 'revenue') {
+                    const row = document.createElement('tr');
+                    const sources = Object.entries(entry.sources)
+                        .filter(([key, value]) => value > 0)
+                        .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: $${value.toFixed(2)}`)
+                        .join(', ');
+                    
+                    row.innerHTML = `
+                        <td>${entry.date}</td>
+                        <td><span style="color: #27ae60; font-weight: bold;">Revenue</span></td>
+                        <td>${sources}</td>
+                        <td style="color: #27ae60; font-weight: bold;">$${entry.total.toFixed(2)}</td>
+                        <td>${entry.notes || '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                } else if (entry.type === 'expense') {
+                    const allCosts = [...entry.fixedCosts, ...entry.variableCosts];
+                    allCosts.forEach(cost => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${entry.date}</td>
+                            <td><span style="color: #e74c3c; font-weight: bold;">Expense</span></td>
+                            <td>${cost.name}</td>
+                            <td style="color: #e74c3c; font-weight: bold;">-${cost.amount.toFixed(2)}</td>
+                            <td>-</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            });
+        }
+
+        // Filter Reports
+        function filterReports() {
+            const monthFilter = document.getElementById('report-month').value;
+            const typeFilter = document.getElementById('report-type').value;
+            const tbody = document.getElementById('reports-tbody');
+            tbody.innerHTML = '';
+
+            let filteredEntries = appData.entries;
+
+            // Filter by month
+            if (monthFilter) {
+                filteredEntries = filteredEntries.filter(entry => entry.date.startsWith(monthFilter));
+            }
+
+            // Filter by type
+            if (typeFilter !== 'all') {
+                filteredEntries = filteredEntries.filter(entry => entry.type === typeFilter);
+            }
+
+            if (filteredEntries.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #6c757d; padding: 2rem;">
+                            No entries match the selected filters.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const sortedEntries = filteredEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedEntries.forEach(entry => {
+                if (entry.type === 'revenue') {
+                    const row = document.createElement('tr');
+                    const sources = Object.entries(entry.sources)
+                        .filter(([key, value]) => value > 0)
+                        .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value.toFixed(2)}`)
+                        .join(', ');
+                    
+                    row.innerHTML = `
+                        <td>${entry.date}</td>
+                        <td><span style="color: #27ae60; font-weight: bold;">Revenue</span></td>
+                        <td>${sources}</td>
+                        <td style="color: #27ae60; font-weight: bold;">${entry.total.toFixed(2)}</td>
+                        <td>${entry.notes || '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                } else if (entry.type === 'expense') {
+                    const allCosts = [...entry.fixedCosts, ...entry.variableCosts];
+                    allCosts.forEach(cost => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${entry.date}</td>
+                            <td><span style="color: #e74c3c; font-weight: bold;">Expense</span></td>
+                            <td>${cost.name}</td>
+                            <td style="color: #e74c3c; font-weight: bold;">-${cost.amount.toFixed(2)}</td>
+                            <td>-</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            });
+        }
+
+        // Initialize App
+        function initApp() {
+            setDefaultDates();
+            updateDashboard();
+            updateReports();
+            
+            // Set current month in report filter
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            document.getElementById('report-month').value = currentMonth;
+        }
+
+        // Start the app when page loads
+        window.addEventListener('load', initApp);
