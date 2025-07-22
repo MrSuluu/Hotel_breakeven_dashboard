@@ -78,208 +78,182 @@
   </style>
 </head>
 <body>
-
-<!-- Navigation -->
-<nav>
-  <button class="nav-link active" onclick="showPage('dashboard')">Dashboard</button>
-  <button class="nav-link" onclick="showPage('revenue')">Revenue</button>
-  <button class="nav-link" onclick="showPage('expenses')">Expenses</button>
-  <button class="nav-link" onclick="showPage('report')">Reports</button>
-</nav>
-
-<!-- Pages -->
-<div id="dashboard" class="page active">
-  <h2>Dashboard</h2>
-  <div class="card">
-    <div class="card-title">Total Revenue</div>
-    <div class="card-value" id="total-revenue">฿0.00</div>
-  </div>
-  <div class="card">
-    <div class="card-title">Total Expenses</div>
-    <div class="card-value" id="total-expenses">฿0.00</div>
-  </div>
-  <div class="card">
-    <div class="card-title">Net Profit</div>
-    <div class="card-value" id="net-profit">฿0.00</div>
-  </div>
-</div>
-
-<div id="revenue" class="page">
-  <h2>Add Revenue</h2>
-  <form id="revenue-form">
-    <input type="text" id="revenue-desc" placeholder="Description" required />
-    <input type="number" id="revenue-amount" placeholder="Amount (THB)" required />
-    <input type="date" id="revenue-date" required />
-    <button type="submit">Save Revenue</button>
-  </form>
-  <table id="revenue-table"></table>
-</div>
-
-<div id="expenses" class="page">
-  <h2>Add Expense</h2>
-  <form id="expense-form">
-    <input type="text" id="expense-desc" placeholder="Description" required />
-    <input type="number" id="expense-amount" placeholder="Amount (THB)" required />
-    <input type="date" id="expense-date" required />
-    <button type="submit">Save Expense</button>
-  </form>
-  <table id="expense-table"></table>
-</div>
-
-<div id="report" class="page">
-  <h2>Monthly Report</h2>
-  <input type="month" id="report-month" />
-  <div class="card">
-    <div class="card-title">Total Revenue</div>
-    <div class="card-value" id="report-revenue">฿0.00</div>
-  </div>
-  <div class="card">
-    <div class="card-title">Total Expenses</div>
-    <div class="card-value" id="report-expenses">฿0.00</div>
-  </div>
-  <div class="card">
-    <div class="card-title">Net Profit</div>
-    <div class="card-value" id="report-net">฿0.00</div>
-  </div>
-</div>
-
-<script>
-  function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    if (pageId === 'revenue') renderTable('revenue');
-    if (pageId === 'expenses') renderTable('expense');
-  }
-
-  window.showPage = showPage;
-
-  document.addEventListener("DOMContentLoaded", () => {
-    let appData = {
-      entries: JSON.parse(localStorage.getItem('hotelAppData')) || [],
-      breakevenTarget: 5000,
-      editIndex: null
-    };
-
-    function saveToLocalStorage() {
-      localStorage.setItem('hotelAppData', JSON.stringify(appData.entries));
+  <!-- [Your HTML content remains unchanged above] -->
+  <script>
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      if (pageId === 'revenue') renderTable('revenue');
+      if (pageId === 'expenses') renderTable('expense');
     }
 
-    function updateDashboard() {
-      const currentMonth = new Date().toISOString().slice(0, 7);
-      const monthlyEntries = appData.entries.filter(e => e.date && e.date.startsWith(currentMonth));
-      const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
-      const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
-      const netProfit = totalRevenue - totalExpenses;
-      document.getElementById('total-revenue').textContent = `฿${totalRevenue.toFixed(2)}`;
-      document.getElementById('total-expenses').textContent = `฿${totalExpenses.toFixed(2)}`;
-      document.getElementById('net-profit').textContent = `฿${netProfit.toFixed(2)}`;
-    }
+    window.showPage = showPage;
 
-    function updateReport(month) {
-      const monthlyEntries = appData.entries.filter(e => e.date && e.date.startsWith(month));
-      const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
-      const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
-      const netProfit = totalRevenue - totalExpenses;
-      document.getElementById('report-revenue').textContent = `฿${totalRevenue.toFixed(2)}`;
-      document.getElementById('report-expenses').textContent = `฿${totalExpenses.toFixed(2)}`;
-      document.getElementById('report-net').textContent = `฿${netProfit.toFixed(2)}`;
-    }
+    window.addEventListener("DOMContentLoaded", function () {
+      const waitForEl = id => new Promise(resolve => {
+        const check = () => {
+          const el = document.getElementById(id);
+          if (el) resolve(el);
+          else setTimeout(check, 50);
+        };
+        check();
+      });
 
-    function renderTable(type) {
-      const table = document.getElementById(`${type}-table`);
-      const entries = appData.entries.filter(e => e.type === type);
-      table.innerHTML = `
-        <thead>
-          <tr><th>Description</th><th>Amount (฿)</th><th>Date</th><th>Actions</th></tr>
-        </thead>
-        <tbody>
-          ${entries.map((e, i) => `
-            <tr>
-              <td>${e.description}</td>
-              <td>${e.total.toFixed(2)}</td>
-              <td>${e.date}</td>
-              <td>
-                <button class="action-btn" onclick="editEntry(${i})">✏️</button>
-                <button class="action-btn" onclick="deleteEntry(${i})">🗑️</button>
-              </td>
-            </tr>`).join('')}
-        </tbody>
-      `;
-    }
+      const init = async () => {
+        await waitForEl("revenue-form");
+        await waitForEl("expense-form");
+        await waitForEl("revenue-date");
+        await waitForEl("expense-date");
+        await waitForEl("report-month");
 
-    window.editEntry = function(index) {
-      const entry = appData.entries[index];
-      appData.editIndex = index;
-      document.getElementById(`${entry.type}-desc`).value = entry.description;
-      document.getElementById(`${entry.type}-amount`).value = entry.total;
-      document.getElementById(`${entry.type}-date`).value = entry.date;
-      showPage(entry.type === 'revenue' ? 'revenue' : 'expenses');
-    };
+        let appData = {
+          entries: JSON.parse(localStorage.getItem('hotelAppData')) || [],
+          breakevenTarget: 5000,
+          editIndex: null
+        };
 
-    window.deleteEntry = function(index) {
-      appData.entries.splice(index, 1);
-      saveToLocalStorage();
-      updateDashboard();
-      renderTable('revenue');
-      renderTable('expense');
-    };
+        function saveToLocalStorage() {
+          localStorage.setItem('hotelAppData', JSON.stringify(appData.entries));
+        }
 
-    document.getElementById("revenue-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const desc = document.getElementById("revenue-desc").value;
-      const amount = parseFloat(document.getElementById("revenue-amount").value);
-      const date = document.getElementById("revenue-date").value;
-      const newEntry = { type: "revenue", description: desc, total: amount, date };
+        function updateDashboard() {
+          const currentMonth = new Date().toISOString().slice(0, 7);
+          const monthlyEntries = appData.entries.filter(entry => entry.date && entry.date.startsWith(currentMonth));
 
-      if (appData.editIndex !== null) {
-        appData.entries[appData.editIndex] = newEntry;
-        appData.editIndex = null;
-      } else {
-        appData.entries.push(newEntry);
-      }
+          const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
+          const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
+          const netProfit = totalRevenue - totalExpenses;
 
-      saveToLocalStorage();
-      updateDashboard();
-      renderTable('revenue');
-      this.reset();
-      document.getElementById("revenue-date").value = new Date().toISOString().slice(0, 10);
-      alert("Revenue saved!");
+          document.getElementById('total-revenue').textContent = totalRevenue.toFixed(2);
+          document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2);
+          document.getElementById('net-profit').textContent = `฿${netProfit.toFixed(2)}`;
+        }
+
+        function updateReport(month) {
+          const monthlyEntries = appData.entries.filter(entry => entry.date && entry.date.startsWith(month));
+
+          const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
+          const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
+          const netProfit = totalRevenue - totalExpenses;
+
+          document.getElementById('report-revenue').textContent = `฿${totalRevenue.toFixed(2)}`;
+          document.getElementById('report-expenses').textContent = `฿${totalExpenses.toFixed(2)}`;
+          document.getElementById('report-net').textContent = `฿${netProfit.toFixed(2)}`;
+        }
+
+        function renderTable(type) {
+          const table = document.getElementById(`${type}-table`);
+          const entries = appData.entries.filter(e => e.type === type);
+          table.innerHTML = `
+            <thead>
+              <tr><th>Description</th><th>Amount (฿)</th><th>Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              ${entries.map((e, i) => `
+                <tr>
+                  <td>${e.description}</td>
+                  <td>${e.total.toFixed(2)}</td>
+                  <td>${e.date}</td>
+                  <td>
+                    <button class="action-btn" onclick="editEntry(${i})">✏️</button>
+                    <button class="action-btn" onclick="deleteEntry(${i})">🗑️</button>
+                  </td>
+                </tr>`).join('')}
+            </tbody>
+          `;
+        }
+
+        window.renderTable = renderTable;
+
+        window.editEntry = function(index) {
+          const entry = appData.entries[index];
+          appData.editIndex = index;
+          const descInput = document.getElementById(`${entry.type}-desc`);
+          const amtInput = document.getElementById(`${entry.type}-amount`);
+          const dateInput = document.getElementById(`${entry.type}-date`);
+          showPage(entry.type === 'revenue' ? 'revenue' : 'expenses');
+          descInput.value = entry.description;
+          amtInput.value = entry.total;
+          dateInput.value = entry.date;
+        };
+
+        window.deleteEntry = function(index) {
+          appData.entries.splice(index, 1);
+          saveToLocalStorage();
+          updateDashboard();
+          renderTable('revenue');
+          renderTable('expense');
+        };
+
+        function setupNavLinks() {
+          const navLinks = document.querySelectorAll('.nav-link');
+          navLinks.forEach(link => {
+            link.addEventListener('click', function () {
+              navLinks.forEach(l => l.classList.remove('active'));
+              this.classList.add('active');
+            });
+          });
+        }
+
+        document.getElementById("revenue-form").addEventListener("submit", function (e) {
+          e.preventDefault();
+          const desc = document.getElementById("revenue-desc").value;
+          const amount = parseFloat(document.getElementById("revenue-amount").value);
+          const date = document.getElementById("revenue-date").value;
+          const newEntry = { type: "revenue", description: desc, total: amount, date };
+
+          if (appData.editIndex !== null) {
+            appData.entries[appData.editIndex] = newEntry;
+            appData.editIndex = null;
+          } else {
+            appData.entries.push(newEntry);
+          }
+
+          saveToLocalStorage();
+          updateDashboard();
+          renderTable('revenue');
+          this.reset();
+          document.getElementById("revenue-date").value = new Date().toISOString().slice(0, 10);
+          alert("Revenue saved!");
+        });
+
+        document.getElementById("expense-form").addEventListener("submit", function (e) {
+          e.preventDefault();
+          const desc = document.getElementById("expense-desc").value;
+          const amount = parseFloat(document.getElementById("expense-amount").value);
+          const date = document.getElementById("expense-date").value;
+          const newEntry = { type: "expense", description: desc, total: amount, date };
+
+          if (appData.editIndex !== null) {
+            appData.entries[appData.editIndex] = newEntry;
+            appData.editIndex = null;
+          } else {
+            appData.entries.push(newEntry);
+          }
+
+          saveToLocalStorage();
+          updateDashboard();
+          renderTable('expense');
+          this.reset();
+          document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
+          alert("Expense saved!");
+        });
+
+        document.getElementById("revenue-date").value = new Date().toISOString().slice(0, 10);
+        document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
+        document.getElementById("report-month").value = new Date().toISOString().slice(0, 7);
+
+        document.getElementById("report-month").addEventListener("change", function () {
+          updateReport(this.value);
+        });
+
+        updateDashboard();
+        updateReport(new Date().toISOString().slice(0, 7));
+        setupNavLinks();
+      };
+
+      init();
     });
-
-    document.getElementById("expense-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const desc = document.getElementById("expense-desc").value;
-      const amount = parseFloat(document.getElementById("expense-amount").value);
-      const date = document.getElementById("expense-date").value;
-      const newEntry = { type: "expense", description: desc, total: amount, date };
-
-      if (appData.editIndex !== null) {
-        appData.entries[appData.editIndex] = newEntry;
-        appData.editIndex = null;
-      } else {
-        appData.entries.push(newEntry);
-      }
-
-      saveToLocalStorage();
-      updateDashboard();
-      renderTable('expense');
-      this.reset();
-      document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
-      alert("Expense saved!");
-    });
-
-    const now = new Date();
-    document.getElementById("revenue-date").value = now.toISOString().slice(0, 10);
-    document.getElementById("expense-date").value = now.toISOString().slice(0, 10);
-    document.getElementById("report-month").value = now.toISOString().slice(0, 7);
-
-    document.getElementById("report-month").addEventListener("change", function () {
-      updateReport(this.value);
-    });
-
-    updateDashboard();
-    updateReport(now.toISOString().slice(0, 7));
-  });
-</script>
+  </script>
 </body>
 </html>
