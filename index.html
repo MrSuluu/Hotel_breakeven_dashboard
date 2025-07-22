@@ -60,6 +60,21 @@
       padding: 0.5rem;
       font-size: 1rem;
     }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    .action-btn {
+      margin-right: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -97,6 +112,7 @@
         <input type="date" id="revenue-date" required />
         <button type="submit">Add Revenue</button>
       </form>
+      <table id="revenue-table"></table>
     </div>
   </div>
   <div id="expenses" class="page">
@@ -108,6 +124,7 @@
         <input type="date" id="expense-date" required />
         <button type="submit">Add Expense</button>
       </form>
+      <table id="expense-table"></table>
     </div>
   </div>
   <div id="reports" class="page">
@@ -133,6 +150,8 @@
     function showPage(pageId) {
       document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
+      if (pageId === 'revenue') renderTable('revenue');
+      if (pageId === 'expenses') renderTable('expense');
     }
 
     window.addEventListener("DOMContentLoaded", function () {
@@ -170,6 +189,52 @@
         document.getElementById('report-net').textContent = `฿${netProfit.toFixed(2)}`;
       }
 
+      function renderTable(type) {
+        const table = document.getElementById(`${type}-table`);
+        const entries = appData.entries.filter(e => e.type === type);
+        table.innerHTML = `
+          <thead>
+            <tr><th>Description</th><th>Amount (฿)</th><th>Date</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            ${entries.map((e, i) => `
+              <tr>
+                <td>${e.description}</td>
+                <td>${e.total.toFixed(2)}</td>
+                <td>${e.date}</td>
+                <td>
+                  <button class="action-btn" onclick="editEntry(${i}, '${type}')">✏️</button>
+                  <button class="action-btn" onclick="deleteEntry(${i})">🗑️</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        `;
+      }
+
+      window.editEntry = function(index, type) {
+        const entry = appData.entries[index];
+        const descInput = document.getElementById(`${type}-desc`);
+        const amtInput = document.getElementById(`${type}-amount`);
+        const dateInput = document.getElementById(`${type}-date`);
+
+        descInput.value = entry.description;
+        amtInput.value = entry.total;
+        dateInput.value = entry.date;
+
+        appData.entries.splice(index, 1);
+        saveToLocalStorage();
+        updateDashboard();
+        renderTable(type);
+      }
+
+      window.deleteEntry = function(index) {
+        appData.entries.splice(index, 1);
+        saveToLocalStorage();
+        updateDashboard();
+        renderTable('revenue');
+        renderTable('expense');
+      }
+
       function setupNavLinks() {
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
@@ -192,6 +257,7 @@
         appData.entries.push({ type: "revenue", description: desc, total: amount, date });
         saveToLocalStorage();
         updateDashboard();
+        renderTable('revenue');
         this.reset();
         document.getElementById("revenue-date").value = new Date().toISOString().slice(0, 10);
         alert("Revenue saved!");
@@ -205,6 +271,7 @@
         appData.entries.push({ type: "expense", description: desc, total: amount, date });
         saveToLocalStorage();
         updateDashboard();
+        renderTable('expense');
         this.reset();
         document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
         alert("Expense saved!");
