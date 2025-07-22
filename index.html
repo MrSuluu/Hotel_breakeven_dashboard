@@ -111,8 +111,23 @@
     </div>
   </div>
   <div id="reports" class="page">
-    <h1>Reports</h1>
-    <div class="card">Coming soon...</div>
+    <h1>Monthly Reports</h1>
+    <div class="card">
+      <label for="report-month">Select Month:</label>
+      <input type="month" id="report-month" />
+    </div>
+    <div class="card">
+      <div class="card-title">Total Revenue</div>
+      <div class="card-value" id="report-revenue">฿0.00</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Total Expenses</div>
+      <div class="card-value" id="report-expenses">฿0.00</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Net Profit</div>
+      <div class="card-value" id="report-net">฿0.00</div>
+    </div>
   </div>
   <script>
     function showPage(pageId) {
@@ -143,6 +158,18 @@
         document.getElementById('net-profit').textContent = `฿${netProfit.toFixed(2)}`;
       }
 
+      function updateReport(month) {
+        const monthlyEntries = appData.entries.filter(entry => entry.date && entry.date.startsWith(month));
+
+        const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
+        const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
+        const netProfit = totalRevenue - totalExpenses;
+
+        document.getElementById('report-revenue').textContent = `฿${totalRevenue.toFixed(2)}`;
+        document.getElementById('report-expenses').textContent = `฿${totalExpenses.toFixed(2)}`;
+        document.getElementById('report-net').textContent = `฿${netProfit.toFixed(2)}`;
+      }
+
       function setupNavLinks() {
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
@@ -155,6 +182,7 @@
 
       document.getElementById("revenue-date").value = new Date().toISOString().slice(0, 10);
       document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
+      document.getElementById("report-month").value = new Date().toISOString().slice(0, 7);
 
       document.getElementById("revenue-form").addEventListener("submit", function (e) {
         e.preventDefault();
@@ -182,7 +210,12 @@
         alert("Expense saved!");
       });
 
+      document.getElementById("report-month").addEventListener("change", function () {
+        updateReport(this.value);
+      });
+
       updateDashboard();
+      updateReport(new Date().toISOString().slice(0, 7));
       setupNavLinks();
     });
   </script>
