@@ -1,0 +1,118 @@
+<!-- Updated HTML with THB currency and localStorage support -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel Financial Tracker (THB)</title>
+  <!-- Include your previous CSS here (same as original, no change needed) -->
+  <style>
+    /* Keep your CSS here (unchanged) */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Navigation and Main Content (same as before) -->
+    <!-- Replace all $ with ฿ in the HTML section where numbers are shown -->
+  </div>
+
+  <script>
+    let appData = {
+      entries: JSON.parse(localStorage.getItem('hotelAppData')) || [],
+      breakevenTarget: 5000
+    };
+
+    function saveToLocalStorage() {
+      localStorage.setItem('hotelAppData', JSON.stringify(appData.entries));
+    }
+
+    window.onload = function () {
+      setDefaultDates();
+      updateDashboard();
+    };
+
+    // Replace all $ signs in JS template strings or concatenations with ฿
+    // Example:
+    document.getElementById('revenue-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const date = document.getElementById('revenue-date').value;
+      const agoda = parseFloat(document.getElementById('revenue-agoda').value) || 0;
+      const booking = parseFloat(document.getElementById('revenue-booking').value) || 0;
+      const walkin = parseFloat(document.getElementById('revenue-walkin').value) || 0;
+      const other = parseFloat(document.getElementById('revenue-other').value) || 0;
+      const occupancy = parseFloat(document.getElementById('occupancy-input').value) || 0;
+      const notes = document.getElementById('revenue-notes').value;
+
+      const totalRevenue = agoda + booking + walkin + other;
+
+      if (totalRevenue > 0) {
+        const entry = {
+          id: Date.now(),
+          date: date,
+          type: 'revenue',
+          sources: { agoda, booking, walkin, other },
+          total: totalRevenue,
+          occupancy: occupancy,
+          notes: notes
+        };
+
+        appData.entries.push(entry);
+        saveToLocalStorage();
+        alert('Revenue entry saved successfully!');
+        this.reset();
+        setDefaultDates();
+        updateDashboard();
+      } else {
+        alert('Please enter at least one revenue amount.');
+      }
+    });
+
+    // Repeat similar for expense form submission and all places showing $...
+
+    function updateDashboard() {
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const monthlyEntries = appData.entries.filter(entry => entry.date.startsWith(currentMonth));
+
+      const totalRevenue = monthlyEntries
+        .filter(entry => entry.type === 'revenue')
+        .reduce((sum, entry) => sum + entry.total, 0);
+
+      const totalExpenses = monthlyEntries
+        .filter(entry => entry.type === 'expense')
+        .reduce((sum, entry) => sum + entry.total, 0);
+
+      const netProfit = totalRevenue - totalExpenses;
+
+      const latestRevenueEntry = monthlyEntries
+        .filter(entry => entry.type === 'revenue' && entry.occupancy)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      const occupancyRate = latestRevenueEntry ? latestRevenueEntry.occupancy : 0;
+
+      document.getElementById('total-revenue').textContent = totalRevenue.toFixed(2);
+      document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2);
+      document.getElementById('occupancy-rate').textContent = occupancyRate.toFixed(1);
+
+      const netProfitElement = document.getElementById('net-profit');
+      netProfitElement.textContent = `฿${netProfit.toFixed(2)}`;
+      netProfitElement.className = `card-value ${netProfit >= 0 ? 'profit-positive' : 'profit-negative'}`;
+
+      const messageElement = document.getElementById('breakeven-message');
+      if (netProfit >= appData.breakevenTarget) {
+        messageElement.innerHTML = `🎉 Congratulations! You're ฿${(netProfit - appData.breakevenTarget).toFixed(2)} above your breakeven target!`;
+        messageElement.className = 'breakeven-message breakeven-success';
+        messageElement.style.display = 'block';
+      } else if (totalRevenue > 0) {
+        const shortfall = appData.breakevenTarget - netProfit;
+        messageElement.innerHTML = `⚠️ You need ฿${shortfall.toFixed(2)} more to reach your breakeven target.`;
+        messageElement.className = 'breakeven-message breakeven-warning';
+        messageElement.style.display = 'block';
+      } else {
+        messageElement.style.display = 'none';
+      }
+    }
+
+    // ...continue with other JS code and apply THB changes throughout
+  </script>
+</body>
+</html>
