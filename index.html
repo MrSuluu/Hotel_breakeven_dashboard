@@ -51,6 +51,27 @@
       font-weight: bold;
       margin-top: 0.25rem;
     }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    input[type="text"], input[type="number"], input[type="date"] {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -81,55 +102,107 @@
   </div>
   <div id="revenue" class="page">
     <h1>Revenue Entry</h1>
-    <div class="card">Coming soon...</div>
+    <div class="card">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="revenue-date">
+      </div>
+      <div class="form-group">
+        <label>Source</label>
+        <input type="text" id="revenue-source">
+      </div>
+      <div class="form-group">
+        <label>Amount (THB)</label>
+        <input type="number" id="revenue-amount">
+      </div>
+      <button onclick="addRevenue()">Add Revenue</button>
+    </div>
   </div>
   <div id="expenses" class="page">
     <h1>Expenses Entry</h1>
-    <div class="card">Coming soon...</div>
+    <div class="card">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="expense-date">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <input type="text" id="expense-category">
+      </div>
+      <div class="form-group">
+        <label>Amount (THB)</label>
+        <input type="number" id="expense-amount">
+      </div>
+      <button onclick="addExpense()">Add Expense</button>
+    </div>
   </div>
   <div id="reports" class="page">
     <h1>Reports</h1>
     <div class="card">Coming soon...</div>
   </div>
   <script>
+    let appData = {
+      entries: JSON.parse(localStorage.getItem('hotelAppData')) || [],
+      breakevenTarget: 5000
+    };
+
+    function saveToLocalStorage() {
+      localStorage.setItem('hotelAppData', JSON.stringify(appData.entries));
+    }
+
+    function updateDashboard() {
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const monthlyEntries = appData.entries.filter(entry => entry.date && entry.date.startsWith(currentMonth));
+
+      const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
+      const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
+      const netProfit = totalRevenue - totalExpenses;
+
+      document.getElementById('total-revenue').textContent = totalRevenue.toFixed(2);
+      document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2);
+      document.getElementById('net-profit').textContent = `฿${netProfit.toFixed(2)}`;
+    }
+
     function showPage(pageId) {
       document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
     }
 
-    window.addEventListener("DOMContentLoaded", function () {
-      let appData = {
-        entries: JSON.parse(localStorage.getItem('hotelAppData')) || [],
-        breakevenTarget: 5000
-      };
-
-      function saveToLocalStorage() {
-        localStorage.setItem('hotelAppData', JSON.stringify(appData.entries));
-      }
-
-      function updateDashboard() {
-        const currentMonth = new Date().toISOString().slice(0, 7);
-        const monthlyEntries = appData.entries.filter(entry => entry.date && entry.date.startsWith(currentMonth));
-
-        const totalRevenue = monthlyEntries.filter(e => e.type === 'revenue').reduce((sum, e) => sum + e.total, 0);
-        const totalExpenses = monthlyEntries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.total, 0);
-        const netProfit = totalRevenue - totalExpenses;
-
-        document.getElementById('total-revenue').textContent = totalRevenue.toFixed(2);
-        document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2);
-        document.getElementById('net-profit').textContent = `฿${netProfit.toFixed(2)}`;
-      }
-
-      function setupNavLinks() {
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-          link.addEventListener('click', function () {
-            navLinks.forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-          });
+    function setupNavLinks() {
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function () {
+          navLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
         });
-      }
+      });
+    }
 
+    function addRevenue() {
+      const date = document.getElementById('revenue-date').value;
+      const source = document.getElementById('revenue-source').value;
+      const total = parseFloat(document.getElementById('revenue-amount').value);
+      if (!date || !source || isNaN(total)) return alert("Please fill in all revenue fields.");
+
+      appData.entries.push({ date, source, total, type: 'revenue' });
+      saveToLocalStorage();
+      updateDashboard();
+      alert("Revenue added!");
+    }
+
+    function addExpense() {
+      const date = document.getElementById('expense-date').value;
+      const category = document.getElementById('expense-category').value;
+      const total = parseFloat(document.getElementById('expense-amount').value);
+      if (!date || !category || isNaN(total)) return alert("Please fill in all expense fields.");
+
+      appData.entries.push({ date, category, total, type: 'expense' });
+      saveToLocalStorage();
+      updateDashboard();
+      alert("Expense added!");
+    }
+
+    window.addEventListener("DOMContentLoaded", function () {
       updateDashboard();
       setupNavLinks();
     });
